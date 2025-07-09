@@ -1,0 +1,18 @@
+{% extends 'callings/_list.html' %}
+
+{% block content %}
+{% with title='Units' create_url='unit-create' update_url='unit-update' delete_url='unit-delete' %}
+{% with headers='Name,Type,Parent Unit,Meeting Time,Status'|split:',' %}
+{{ block.super }}
+{% endwith %}
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any unit-specific JavaScript here
+});
+</script>
+{% endblock %}

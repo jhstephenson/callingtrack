@@ -1,0 +1,159 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Position{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">{% if form.instance.pk %}Edit{% else %}Create New{% endif %} Position</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    {{ form.title.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.title.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.title.help_text }}</div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.organization.id_for_label }}" class="form-label">
+                                    {{ form.organization.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {{ form.organization }}
+                                {% if form.organization.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.organization.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.organization.help_text }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    {{ form.is_leadership }}
+                                    <label class="form-check-label" for="{{ form.is_leadership.id_for_label }}">
+                                        {{ form.is_leadership.label }}
+                                    </label>
+                                    {% if form.is_leadership.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.is_leadership.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.is_leadership.help_text }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    {{ form.requires_setting_apart }}
+                                    <label class="form-check-label" for="{{ form.requires_setting_apart.id_for_label }}">
+                                        {{ form.requires_setting_apart.label }}
+                                    </label>
+                                    {% if form.requires_setting_apart.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.requires_setting_apart.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.requires_setting_apart.help_text }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                {{ form.description.label }}
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.description.help_text }}</div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-4">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                {{ form.is_active.label }}
+                            </label>
+                            {% if form.is_active.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.is_active.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.is_active.help_text }}</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% if form.instance.pk %}{% url 'position-detail' form.instance.pk %}{% else %}{% url 'position-list' %}{% endif %}" 
+                               class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if form.instance.pk %}Update{% else %}Create{% endif %} Position
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+    
+    // Initialize select2 for organization field if available
+    if (document.getElementById('{{ form.organization.id_for_label }}')) {
+        // You can add select2 initialization here if needed
+        // Example:
+        // $('#{{ form.organization.id_for_label }}').select2({
+        //     placeholder: 'Select an organization',
+        //     allowClear: true
+        // });
+    }
+});
+</script>
+{% endblock %}

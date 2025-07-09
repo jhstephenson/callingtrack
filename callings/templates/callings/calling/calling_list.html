@@ -1,0 +1,18 @@
+{% extends 'callings/_list.html' %}
+
+{% block content %}
+{% with title='Callings' create_url='calling-create' update_url='calling-update' delete_url='calling-delete' %}
+{% with headers='Member,Position,Unit,Status,Dates'|split:',' %}
+{{ block.super }}
+{% endwith %}
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any calling-specific JavaScript here
+});
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'callings/_list.html' %}
+
+{% block content %}
+{% with title='Members' create_url='member-create' update_url='member-update' delete_url='member-delete' %}
+{% with headers='Name,Unit,Callings,Contact'|split:',' %}
+{{ block.super }}
+{% endwith %}
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any member-specific JavaScript here
+});
+</script>
+{% endblock %}

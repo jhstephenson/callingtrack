@@ -1,0 +1,18 @@
+{% extends 'callings/_list.html' %}
+
+{% block content %}
+{% with title='Organizations' create_url='organization-create' update_url='organization-update' delete_url='organization-delete' %}
+{% with headers='Name,Unit,Leader,Status'|split:',' %}
+{{ block.super }}
+{% endwith %}
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any organization-specific JavaScript here
+});
+</script>
+{% endblock %}

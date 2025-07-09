@@ -1,0 +1,138 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}{{ object.name }} - Unit Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ object.name }} <small class="text-muted">Unit</small></h1>
+        <div class="btn-group" role="group">
+            <a href="{% url 'unit-update' object.pk %}" class="btn btn-outline-secondary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'unit-delete' object.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Unit Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9">{{ object.name }}</dd>
+                        
+                        <dt class="col-sm-3">Type</dt>
+                        <dd class="col-sm-9">{{ object.get_unit_type_display }}</dd>
+                        
+                        {% if object.parent_unit %}
+                        <dt class="col-sm-3">Parent Unit</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'unit-detail' object.parent_unit.pk %}">
+                                {{ object.parent_unit.name }}
+                            </a>
+                        </dd>
+                        {% endif %}
+                        
+                        {% if object.meeting_time %}
+                        <dt class="col-sm-3">Meeting Time</dt>
+                        <dd class="col-sm-9">{{ object.meeting_time|time:"g:i A" }}</dd>
+                        {% endif %}
+                        
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-{% if object.is_active %}success{% else %}secondary{% endif %}">
+                                {% if object.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </dd>
+                        
+                        {% if object.location %}
+                        <dt class="col-sm-3">Location</dt>
+                        <dd class="col-sm-9">{{ object.location }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+            
+            {% if child_units %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Child Units</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for unit in child_units %}
+                        <a href="{% url 'unit-detail' unit.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ unit.name }}</h6>
+                                <small class="text-muted">{{ unit.get_unit_type_display }}</small>
+                            </div>
+                            <small class="text-muted">
+                                {% if unit.meeting_time %}{{ unit.meeting_time|time:"g:i A" }}{% else %}No meeting time{% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ member_count }}</div>
+                            <div class="text-muted">Members</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ active_callings_count }}</div>
+                            <div class="text-muted">Active Callings</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ organization_count }}</div>
+                            <div class="text-muted">Organizations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_activity %}
+                    <div class="list-group list-group-flush">
+                        {% for activity in recent_activity %}
+                        <div class="list-group-item
+                            {% if 'created' in activity.description %}bg-light{% endif %}
+                            {% if 'updated' in activity.description %}bg-light{% endif %}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <small class="mb-1">{{ activity.description }}</small>
+                                <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p class="mb-0">No recent activity</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

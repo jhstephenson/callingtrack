@@ -1,0 +1,186 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}{{ object.name }} - Organization Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ object.name }} <small class="text-muted">Organization</small></h1>
+        <div class="btn-group" role="group">
+            <a href="{% url 'organization-update' object.pk %}" class="btn btn-outline-secondary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'organization-delete' object.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Organization Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9">{{ object.name }}</dd>
+                        
+                        <dt class="col-sm-3">Unit</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'unit-detail' object.unit.pk %}">
+                                {{ object.unit.name }}
+                            </a>
+                        </dd>
+                        
+                        {% if object.leader %}
+                        <dt class="col-sm-3">Leader</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'member-detail' object.leader.pk %}">
+                                {{ object.leader.get_full_name }}
+                            </a>
+                        </dd>
+                        {% endif %}
+                        
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-{% if object.is_active %}success{% else %}secondary{% endif %}">
+                                {% if object.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </dd>
+                        
+                        {% if object.description %}
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ object.description|linebreaksbr }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Positions ({{ positions|length }})</h5>
+                        <a href="{% url 'position-create' %}?organization={{ object.pk }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus"></i> Add Position
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if positions %}
+                    <div class="list-group list-group-flush">
+                        {% for position in positions %}
+                        <a href="{% url 'position-detail' position.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ position.title }}</h6>
+                                <small class="text-muted">
+                                    {% if position.is_leadership %}<span class="badge bg-info">Leadership</span>{% endif %}
+                                    {% if position.requires_setting_apart %}<span class="badge bg-warning">Requires Setting Apart</span>{% endif %}
+                                </small>
+                            </div>
+                            <small class="text-muted">
+                                {% if position.current_calling %}
+                                    Filled by: {{ position.current_calling.member.get_full_name }}
+                                {% else %}
+                                    Vacant
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p class="mb-0">No positions found for this organization.</p>
+                        <a href="{% url 'position-create' %}?organization={{ object.pk }}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus"></i> Add Position
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if callings %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Current Callings ({{ callings|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for calling in callings %}
+                        <a href="{% url 'calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ calling.position.title }}</h6>
+                                <span class="badge bg-{{ calling.get_status_badge_class }}">
+                                    {{ calling.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="mb-1">{{ calling.member.get_full_name }}</p>
+                            <small class="text-muted">
+                                Called on {{ calling.date_called|date:"M d, Y" }}
+                                {% if calling.date_sustained %}
+                                    • Sustained on {{ calling.date_sustained|date:"M d, Y" }}
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ positions|length }}</div>
+                            <div class="text-muted">Positions</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ active_callings_count }}</div>
+                            <div class="text-muted">Active Callings</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h3 mb-0">{{ past_callings_count }}</div>
+                            <div class="text-muted">Past Callings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_activity %}
+                    <div class="list-group list-group-flush">
+                        {% for activity in recent_activity %}
+                        <div class="list-group-item
+                            {% if 'created' in activity.description %}bg-light{% endif %}
+                            {% if 'updated' in activity.description %}bg-light{% endif %}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <small class="mb-1">{{ activity.description }}</small>
+                                <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p class="mb-0">No recent activity</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

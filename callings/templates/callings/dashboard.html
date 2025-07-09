@@ -1,0 +1,242 @@
+{% extends 'callings/base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard - CallingTrack{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-4">Dashboard</h1>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-0">Total Units</h6>
+                        <h2 class="mb-0">{{ total_units|intcomma }}</h2>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-church fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-0">Total Members</h6>
+                        <h2 class="mb-0">{{ total_members|intcomma }}</h2>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-users fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-0">Total Callings</h6>
+                        <h2 class="mb-0">{{ total_callings|intcomma }}</h2>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-phone-alt fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-0">Active Callings</h6>
+                        <h2 class="mb-0">{{ active_callings|intcomma }}</h2>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-user-check fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Callings -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Callings</h5>
+                <a href="{% url 'calling-list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Member</th>
+                                <th>Position</th>
+                                <th>Unit</th>
+                                <th>Date Called</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for calling in recent_callings %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'member-detail' calling.member.id %}">
+                                        {{ calling.member.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'position-detail' calling.position.id %}">
+                                        {{ calling.position.title }}
+                                    </a>
+                                </td>
+                                <td>{{ calling.unit.name }}</td>
+                                <td>{{ calling.date_called|date:"M d, Y"|default:"-" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ calling.calling_status|lower }}">
+                                        {{ calling.get_calling_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                                    <p class="mb-0">No recent callings found</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Callings -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Upcoming Callings</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for calling in upcoming_callings %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ calling.member.name }}</h6>
+                            <small class="text-muted">
+                                {% if calling.date_called %}{{ calling.date_called|date:"M d" }}{% endif %}
+                                {% if calling.date_sustained %}<i class="fas fa-arrow-right mx-1"></i>{% endif %}
+                                {% if calling.date_sustained %}{{ calling.date_sustained|date:"M d" }}{% endif %}
+                            </small>
+                        </div>
+                        <p class="mb-1">{{ calling.position.title }}</p>
+                        <small class="text-muted">{{ calling.unit.name }}</small>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-alt fa-2x text-muted mb-2"></i>
+                        <p class="mb-0">No upcoming callings</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Chart (Placeholder) -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Callings by Status</h5>
+            </div>
+            <div class="card-body">
+                <div id="statusChart" style="height: 200px;">
+                    <!-- Chart will be rendered here by JavaScript -->
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Status Chart
+    const statusCtx = document.createElement('canvas');
+    document.getElementById('statusChart').innerHTML = '';
+    document.getElementById('statusChart').appendChild(statusCtx);
+    
+    const statusData = {
+        labels: {{ calling_status_data|safe|default:'[]' }}.map(item => {
+            // Convert status code to readable format
+            const statusMap = {
+                'ACTIVE': 'Active',
+                'RELEASED': 'Released',
+                'PENDING': 'Pending'
+            };
+            return statusMap[item.calling_status] || item.calling_status;
+        }),
+        datasets: [{
+            data: {{ calling_status_data|safe|default:'[]' }}.map(item => item.count),
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: statusData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

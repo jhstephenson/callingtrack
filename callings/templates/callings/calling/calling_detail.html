@@ -1,0 +1,450 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}{{ object.member.get_full_name }} - {{ object.position.title }} - Calling Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">{{ object.position.title }}</h1>
+            <p class="lead mb-0">{{ object.member.get_full_name }}</p>
+            <p class="text-muted mb-0">
+                {{ object.position.organization.name }}
+                <span class="text-muted">({{ object.position.organization.unit.name }})</span>
+            </p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'calling-update' object.pk %}" class="btn btn-outline-secondary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'calling-delete' object.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+            {% if object.status != 'RELEASED' %}
+            <a href="{% url 'calling-release' object.pk %}" class="btn btn-outline-warning">
+                <i class="fas fa-sign-out-alt"></i> Release
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Calling Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-{{ object.get_status_badge_class }}">
+                                {{ object.get_status_display }}
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-3">Member</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'member-detail' object.member.pk %}">
+                                {{ object.member.get_full_name }}
+                            </a>
+                            <span class="text-muted">({{ object.member.unit.name }})</span>
+                        </dd>
+                        
+                        <dt class="col-sm-3">Position</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'position-detail' object.position.pk %}">
+                                {{ object.position.title }}
+                            </a>
+                            <span class="text-muted">({{ object.position.organization.name }})</span>
+                        </dd>
+                        
+                        <dt class="col-sm-3">Organization</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'organization-detail' object.position.organization.pk %}">
+                                {{ object.position.organization.name }}
+                            </a>
+                            <span class="text-muted">({{ object.position.organization.unit.name }})</span>
+                        </dd>
+                        
+                        <dt class="col-sm-3">Unit</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'unit-detail' object.position.organization.unit.pk %}">
+                                {{ object.position.organization.unit.name }}
+                            </a>
+                        </dd>
+                        
+                        {% if object.position.requires_setting_apart %}
+                        <dt class="col-sm-3">Setting Apart</dt>
+                        <dd class="col-sm-9">
+                            {% if object.date_set_apart %}
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle"></i> Set apart on {{ object.date_set_apart|date:"F d, Y" }}
+                                </span>
+                            {% else %}
+                                <span class="text-warning">
+                                    <i class="fas fa-exclamation-circle"></i> Setting apart required but not yet scheduled
+                                </span>
+                            {% endif %}
+                        </dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item {% if object.date_called %}completed{% endif %}">
+                            <div class="timeline-marker">
+                                {% if object.date_called %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Called</h6>
+                                <p class="text-muted mb-0">
+                                    {% if object.date_called %}
+                                        {{ object.date_called|date:"F d, Y" }}
+                                    {% else %}
+                                        Not yet called
+                                    {% endif %}
+                                </p>
+                                {% if object.calling_approval_status %}
+                                <span class="badge bg-{{ object.get_approval_status_class 'calling' }}">
+                                    {{ object.get_calling_approval_status_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if object.date_sustained %}completed{% endif %}">
+                            <div class="timeline-marker">
+                                {% if object.date_sustained %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Sustained</h6>
+                                <p class="text-muted mb-0">
+                                    {% if object.date_sustained %}
+                                        {{ object.date_sustained|date:"F d, Y" }}
+                                    {% else %}
+                                        Not yet sustained
+                                    {% endif %}
+                                </p>
+                                {% if object.sustaining_approval_status %}
+                                <span class="badge bg-{{ object.get_approval_status_class 'sustaining' }}">
+                                    {{ object.get_sustaining_approval_status_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if object.position.requires_setting_apart %}
+                        <div class="timeline-item {% if object.date_set_apart %}completed{% endif %}">
+                            <div class="timeline-marker">
+                                {% if object.date_set_apart %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Set Apart</h6>
+                                <p class="text-muted mb-0">
+                                    {% if object.date_set_apart %}
+                                        {{ object.date_set_apart|date:"F d, Y" }}
+                                    {% else %}
+                                        Not yet set apart
+                                    {% endif %}
+                                </p>
+                                {% if object.setting_apart_approval_status %}
+                                <span class="badge bg-{{ object.get_approval_status_class 'setting_apart' }}">
+                                    {{ object.get_setting_apart_approval_status_display }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if object.status == 'RELEASED' %}
+                        <div class="timeline-item completed">
+                            <div class="timeline-marker">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Released</h6>
+                                <p class="text-muted mb-0">
+                                    {{ object.date_released|date:"F d, Y" }}
+                                </p>
+                                {% if object.released_approval_status %}
+                                <span class="badge bg-{{ object.get_approval_status_class 'released' }}">
+                                    {{ object.get_released_approval_status_display }}
+                                </span>
+                                {% endif %}
+                                {% if object.release_notes %}
+                                <div class="alert alert-light mt-2 mb-0">
+                                    <small class="text-muted">{{ object.release_notes }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% if object.notes %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Notes</h5>
+                </div>
+                <div class="card-body">
+                    {{ object.notes|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Calling Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="mb-0">
+                        <dt>Calling Status</dt>
+                        <dd>
+                            <span class="badge bg-{{ object.get_status_badge_class }}">
+                                {{ object.get_status_display }}
+                            </span>
+                        </dd>
+                        
+                        <dt>Position Type</dt>
+                        <dd>
+                            {% if object.position.is_leadership %}
+                                <span class="badge bg-info">Leadership</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Auxiliary</span>
+                            {% endif %}
+                            
+                            {% if object.position.requires_setting_apart %}
+                                <span class="badge bg-warning">Requires Setting Apart</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt>Duration</dt>
+                        <dd>
+                            {% if object.date_released %}
+                                {{ object.date_called|timesince:object.date_released }}
+                            {% else %}
+                                {{ object.date_called|timesince }} (ongoing)
+                            {% endif %}
+                        </dd>
+                        
+                        <dt>Created</dt>
+                        <dd>{{ object.created_at|date:"F d, Y" }}</dd>
+                        
+                        <dt>Last Updated</dt>
+                        <dd>{{ object.updated_at|timesince }} ago</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Approval Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Calling Extended</span>
+                            {% if object.calling_approval_status %}
+                            <span class="badge bg-{{ object.get_approval_status_class 'calling' }}">
+                                {{ object.get_calling_approval_status_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Required</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar bg-{{ object.get_approval_status_class 'calling' }}" 
+                                 role="progressbar" 
+                                 style="width: {% if object.calling_approval_status %}100%{% else %}0%{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Sustaining Vote</span>
+                            {% if object.sustaining_approval_status %}
+                            <span class="badge bg-{{ object.get_approval_status_class 'sustaining' }}">
+                                {{ object.get_sustaining_approval_status_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Required</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar bg-{{ object.get_approval_status_class 'sustaining' }}" 
+                                 role="progressbar" 
+                                 style="width: {% if object.sustaining_approval_status %}100%{% else %}0%{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if object.position.requires_setting_apart %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Setting Apart</span>
+                            {% if object.setting_apart_approval_status %}
+                            <span class="badge bg-{{ object.get_approval_status_class 'setting_apart' }}">
+                                {{ object.get_setting_apart_approval_status_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Required</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar bg-{{ object.get_approval_status_class 'setting_apart' }}" 
+                                 role="progressbar" 
+                                 style="width: {% if object.setting_apart_approval_status %}100%{% else %}0%{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if object.status == 'RELEASED' %}
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Release</span>
+                            {% if object.released_approval_status %}
+                            <span class="badge bg-{{ object.get_approval_status_class 'released' }}">
+                                {{ object.get_released_approval_status_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Not Required</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar bg-{{ object.get_approval_status_class 'released' }}" 
+                                 role="progressbar" 
+                                 style="width: {% if object.released_approval_status %}100%{% else %}0%{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if object.status == 'PROPOSED' %}
+                        <a href="{% url 'calling-update-status' object.pk 'SUSTAINED' %}" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Mark as Sustained
+                        </a>
+                        {% endif %}
+                        
+                        {% if object.status == 'SUSTAINED' and object.position.requires_setting_apart and not object.date_set_apart %}
+                        <a href="{% url 'calling-update-status' object.pk 'SET_APART' %}" class="btn btn-success">
+                            <i class="fas fa-hands-praying"></i> Mark as Set Apart
+                        </a>
+                        {% endif %}
+                        
+                        {% if object.status != 'RELEASED' %}
+                        <a href="{% url 'calling-release' object.pk %}" class="btn btn-warning">
+                            <i class="fas fa-sign-out-alt"></i> Release from Calling
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'calling-update' object.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Details
+                        </a>
+                        
+                        <a href="{% url 'calling-delete' object.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash"></i> Delete Calling
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+    margin: 0 0 0 1rem;
+    border-left: 2px solid #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -1.75rem;
+    top: 0.25rem;
+    color: #6c757d;
+    background: #fff;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #dee2e6;
+}
+
+.timeline-content {
+    position: relative;
+}
+
+.timeline-item.completed .timeline-marker {
+    border-color: #198754;
+    color: #198754;
+}
+
+.progress {
+    overflow: visible;
+}
+
+.progress-bar {
+    position: relative;
+    overflow: visible;
+    transition: width 0.6s ease;
+}
+
+.progress-bar:after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: inherit;
+}
+</style>
+{% endblock %}

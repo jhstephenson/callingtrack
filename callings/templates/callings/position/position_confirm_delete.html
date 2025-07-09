@@ -1,0 +1,96 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}Delete Position{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+                </div>
+                <div class="card-body">
+                    <h4>Are you sure you want to delete this position?</h4>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ object.title }}</h5>
+                            <p class="card-text">
+                                <strong>Organization:</strong> {{ object.organization.name }}<br>
+                                <strong>Unit:</strong> {{ object.organization.unit.name }}<br>
+                                <strong>Status:</strong> 
+                                <span class="badge bg-{% if object.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if object.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                                {% if object.is_leadership %}
+                                <span class="badge bg-info ms-1">Leadership</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if current_calling %}
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Warning</h5>
+                        <p>This position has an active calling. Deleting this position will also delete the active calling.</p>
+                        <div class="card bg-light mt-2">
+                            <div class="card-body p-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-2">
+                                        <h6 class="mb-0">{{ current_calling.member.get_full_name }}</h6>
+                                        <small class="text-muted">
+                                            {{ current_calling.get_status_display }} • 
+                                            Called on {{ current_calling.date_called|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if past_callings_count > 0 %}
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Warning</h5>
+                        <p>This position has {{ past_callings_count }} past calling(s) in the system. These callings will be permanently deleted.</p>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'position-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Back to Position
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Yes, Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirm before submitting the form
+    var form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var confirmed = confirm('Are you absolutely sure you want to delete this position and all associated callings? This action cannot be undone.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}Delete Calling{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+                </div>
+                <div class="card-body">
+                    <h4>Are you sure you want to delete this calling record?</h4>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-user-circle fa-3x text-muted"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-1">{{ object.member.get_full_name }}</h5>
+                                    <p class="mb-1">
+                                        <strong>{{ object.position.title }}</strong>
+                                        <span class="text-muted">({{ object.position.organization.name }})</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <span class="badge bg-{{ object.get_status_badge_class }}">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        <span class="text-muted ms-2">
+                                            Called on {{ object.date_called|date:"M d, Y" }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Warning</h5>
+                        <p>This action cannot be undone. The following information will be permanently deleted:</p>
+                        <ul>
+                            <li>Calling record for {{ object.member.get_full_name }} as {{ object.position.title }}</li>
+                            <li>All associated dates (called, sustained, set apart, released)</li>
+                            <li>All approval statuses and notes</li>
+                        </ul>
+                    </div>
+                    
+                    {% if object.status == 'ACTIVE' %}
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-circle"></i> Active Calling</h5>
+                        <p class="mb-0">
+                            This is an active calling. Deleting this record will remove it from the system as if it never existed.
+                            Consider using the "Release" action instead to properly record the end of this calling.
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="delete_reason" class="form-label">
+                                Reason for deletion <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="delete_reason" name="delete_reason" rows="3" required></textarea>
+                            <div class="form-text">Please explain why you are deleting this calling record.</div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirm_delete" required>
+                            <label class="form-check-label" for="confirm_delete">
+                                I understand that this action cannot be undone and this data will be permanently deleted.
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'calling-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Back to Calling
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="delete-button">
+                                <i class="fas fa-trash"></i> Yes, Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Disable delete button by default
+    const deleteButton = document.getElementById('delete-button');
+    const confirmCheckbox = document.getElementById('confirm_delete');
+    const deleteReason = document.getElementById('delete_reason');
+    
+    if (deleteButton && confirmCheckbox) {
+        deleteButton.disabled = true;
+        
+        // Enable/disable delete button based on checkbox and reason
+        function updateDeleteButton() {
+            const isConfirmed = confirmCheckbox.checked;
+            const hasReason = deleteReason && deleteReason.value.trim().length > 0;
+            deleteButton.disabled = !(isConfirmed && hasReason);
+        }
+        
+        confirmCheckbox.addEventListener('change', updateDeleteButton);
+        
+        if (deleteReason) {
+            deleteReason.addEventListener('input', updateDeleteButton);
+        }
+        
+        // Add confirmation before submitting
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Are you absolutely sure you want to permanently delete this calling record? This action cannot be undone.')) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Validate required fields
+                if (deleteReason && !deleteReason.value.trim()) {
+                    e.preventDefault();
+                    alert('Please provide a reason for deletion.');
+                    deleteReason.focus();
+                    return false;
+                }
+                
+                if (!confirmCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Please confirm that you understand this action cannot be undone.');
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+    }
+});
+</script>
+{% endblock %}
