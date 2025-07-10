@@ -7,10 +7,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ object.name }} <small class="text-muted">Unit</small></h1>
         <div class="btn-group" role="group">
-            <a href="{% url 'unit-update' object.pk %}" class="btn btn-outline-secondary">
+            <a href="{% url 'callings:unit-update' object.pk %}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{% url 'unit-delete' object.pk %}" class="btn btn-outline-danger">
+            <a href="{% url 'callings:unit-delete' object.pk %}" class="btn btn-outline-danger">
                 <i class="fas fa-trash"></i> Delete
             </a>
         </div>
@@ -33,7 +33,7 @@
                         {% if object.parent_unit %}
                         <dt class="col-sm-3">Parent Unit</dt>
                         <dd class="col-sm-9">
-                            <a href="{% url 'unit-detail' object.parent_unit.pk %}">
+                            <a href="{% url 'callings:unit-detail' object.parent_unit.pk %}">
                                 {{ object.parent_unit.name }}
                             </a>
                         </dd>
@@ -67,7 +67,7 @@
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
                         {% for unit in child_units %}
-                        <a href="{% url 'unit-detail' unit.pk %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'callings:unit-detail' unit.pk %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">{{ unit.name }}</h6>
                                 <small class="text-muted">{{ unit.get_unit_type_display }}</small>

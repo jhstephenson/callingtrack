@@ -20,11 +20,15 @@ class Unit(models.Model):
     meeting_time = models.TimeField(null=True, blank=True, help_text="Regular meeting time for this unit")
     location = models.CharField(max_length=200, blank=True, help_text="Physical location of the unit")
     is_active = models.BooleanField(default=True, help_text="Whether this unit is currently active")
+    sort_order = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Order in which units should be displayed (lower numbers first)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['sort_order', 'name']
 
     def __str__(self):
         unit_type_display = self.get_unit_type_display()

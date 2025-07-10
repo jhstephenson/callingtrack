@@ -62,7 +62,7 @@ def dashboard(request):
     context['total_units'] = Unit.objects.count()
     context['total_callings'] = Calling.objects.filter(is_active=True).count()
     context['active_callings'] = Calling.objects.filter(calling_status='ACTIVE').count()
-    context['recent_callings'] = recent_callings.order_by('-date_called')[:10]
+    context['recent_callings'] = recent_callings.order_by('-created_at')[:10]
     
     # Get upcoming events (next 30 days)
     today = timezone.now().date()
@@ -76,12 +76,15 @@ def dashboard(request):
         is_active=True
     ).select_related('position').order_by('date_released')[:10]
     
-    # Upcoming callings and other events
+    # Upcoming callings and other events (callings that have future dates or pending approval)
     context['upcoming_callings'] = Calling.objects.filter(
         Q(date_called__range=[today, thirty_days_later]) |
         Q(date_sustained__range=[today, thirty_days_later]) |
-        Q(date_set_apart__range=[today, thirty_days_later])
-    ).select_related('position', 'unit').order_by('date_called')[:5]
+        Q(date_set_apart__range=[today, thirty_days_later]) |
+        Q(status__in=['PENDING', 'APPROVED'], date_called__isnull=True) |
+        Q(status='APPROVED', date_sustained__isnull=True) |
+        Q(status='APPROVED', date_set_apart__isnull=True, position__requires_setting_apart=True)
+    ).select_related('position', 'unit').order_by('date_called', 'date_sustained', 'date_set_apart')[:5]
     
     # Get calling statistics by status
     context['calling_status_stats'] = (
@@ -283,6 +286,8 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
             queryset = queryset.filter(status='CANCELLED')
         elif status_filter == 'on_hold':
             queryset = queryset.filter(status='ON_HOLD')
+        elif status_filter == 'active':
+            queryset = queryset.filter(calling_status='ACTIVE')
         elif status_filter == 'all':
             # Show all callings
             pass
@@ -290,7 +295,7 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
             # Default: show all callings
             pass
         
-        return queryset.order_by('unit__name', 'organization__name', 'position__title')
+        return queryset.order_by('unit__sort_order', 'unit__name', 'organization__name', 'position__title')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -316,6 +321,7 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
         context['on_hold_count'] = all_callings.filter(status='ON_HOLD').count()
+        context['active_count'] = all_callings.filter(calling_status='ACTIVE').count()
         context['all_count'] = all_callings.count()
         
         # Current filter for template
@@ -361,27 +367,32 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
             queryset = queryset.filter(status='CANCELLED')
         elif status_filter == 'on_hold':
             queryset = queryset.filter(status='ON_HOLD')
+        elif status_filter == 'active':
+            queryset = queryset.filter(calling_status='ACTIVE')
         elif status_filter == 'all':
             pass
         else:
             # Default: show all callings
             pass
         
-        return queryset.order_by('unit__name', 'organization__name', 'position__title')
+        return queryset.order_by('unit__sort_order', 'unit__name', 'organization__name', 'position__title')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
         # Group callings by unit
         callings_by_unit = {}
+        unit_objects = {}
         for calling in context['callings']:
             unit_name = str(calling.unit)
             if unit_name not in callings_by_unit:
                 callings_by_unit[unit_name] = []
+                unit_objects[unit_name] = calling.unit
             callings_by_unit[unit_name].append(calling)
         
-        # Sort by unit name
-        context['callings_by_unit'] = dict(sorted(callings_by_unit.items()))
+        # Sort by unit sort_order, then by name
+        sorted_units = sorted(unit_objects.items(), key=lambda x: (x[1].sort_order, x[1].name))
+        context['callings_by_unit'] = {unit_name: callings_by_unit[unit_name] for unit_name, unit_obj in sorted_units}
         
         # Get counts (reuse logic from CallingListView)
         all_callings = Calling.objects.select_related('position', 'organization', 'unit')
@@ -401,6 +412,7 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
         context['on_hold_count'] = all_callings.filter(status='ON_HOLD').count()
+        context['active_count'] = all_callings.filter(calling_status='ACTIVE').count()
         context['all_count'] = all_callings.count()
         
         context['current_status'] = self.request.GET.get('status', 'all')

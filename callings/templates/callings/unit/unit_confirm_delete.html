@@ -58,7 +58,7 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'unit-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
+                            <a href="{% url 'callings:unit-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left"></i> Back to Unit
                             </a>
                             <button type="submit" class="btn btn-danger">

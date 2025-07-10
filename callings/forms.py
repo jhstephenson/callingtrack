@@ -7,7 +7,7 @@ from .models import Unit, Organization, Position, Calling
 class UnitForm(ModelForm):
     class Meta:
         model = Unit
-        fields = ['name', 'unit_type', 'parent_unit', 'meeting_time', 'location', 'is_active']
+        fields = ['name', 'unit_type', 'parent_unit', 'meeting_time', 'location', 'sort_order', 'is_active']
         widgets = {
             'meeting_time': forms.TimeInput(attrs={'type': 'time'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),

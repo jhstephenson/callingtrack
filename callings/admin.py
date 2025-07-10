@@ -3,9 +3,10 @@ from .models import Unit, Organization, Position, Calling, CallingHistory
 
 
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ('name', 'unit_type', 'created_at', 'updated_at')
+    list_display = ('name', 'unit_type', 'sort_order', 'created_at', 'updated_at')
     list_filter = ('unit_type',)
     search_fields = ('name',)
+    ordering = ('sort_order', 'name')
 
 
 class OrganizationAdmin(admin.ModelAdmin):

@@ -13,52 +13,58 @@
 <!-- Stats Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-6 col-lg-3">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-0">Total Units</h6>
-                        <h2 class="mb-0">{{ total_units|intcomma }}</h2>
-                    </div>
-                    <div class="bg-primary bg-opacity-10 p-3 rounded">
-                        <i class="fas fa-church fa-2x text-primary"></i>
+        <a href="{% url 'callings:unit-list' %}" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-0">Total Units</h6>
+                            <h2 class="mb-0">{{ total_units|intcomma }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-church fa-2x text-primary"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     
     
     <div class="col-md-6 col-lg-3">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-0">Total Callings</h6>
-                        <h2 class="mb-0">{{ total_callings|intcomma }}</h2>
-                    </div>
-                    <div class="bg-info bg-opacity-10 p-3 rounded">
-                        <i class="fas fa-phone-alt fa-2x text-info"></i>
+        <a href="{% url 'callings:calling-list' %}" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-0">Total Callings</h6>
+                            <h2 class="mb-0">{{ total_callings|intcomma }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-phone-alt fa-2x text-info"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     
     <div class="col-md-6 col-lg-3">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-0">Active Callings</h6>
-                        <h2 class="mb-0">{{ active_callings|intcomma }}</h2>
-                    </div>
-                    <div class="bg-warning bg-opacity-10 p-3 rounded">
-                        <i class="fas fa-user-check fa-2x text-warning"></i>
+        <a href="{% url 'callings:calling-list' %}?status=active" class="text-decoration-none">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-0">Active Callings</h6>
+                            <h2 class="mb-0">{{ active_callings|intcomma }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-user-check fa-2x text-warning"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -78,7 +84,7 @@
                                 <th>Member</th>
                                 <th>Position</th>
                                 <th>Unit</th>
-                                <th>Date Called</th>
+                                <th>Date Created</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -94,7 +100,7 @@
                                     </a>
                                 </td>
                                 <td>{{ calling.unit.name }}</td>
-                                <td>{{ calling.date_called|date:"M d, Y"|default:"-" }}</td>
+                                <td>{{ calling.created_at|date:"M d, Y" }}</td>
                                 <td>
                                     <span class="badge bg-{{ calling.calling_status|lower }}">
                                         {{ calling.get_calling_status_display }}
@@ -165,6 +171,28 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.stat-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+a:hover .stat-card {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+a:hover h2, a:hover h6 {
+    color: inherit !important;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
