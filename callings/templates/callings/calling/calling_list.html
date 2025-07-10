@@ -18,39 +18,35 @@
     <!-- Search and Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <!-- Search Bar -->
-            <form method="get" class="mb-3">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" name="search" class="form-control" 
-                                   placeholder="Search by name, position, organization, unit, or proposed replacement..." 
-                                   value="{{ current_search }}">
-                            <button type="submit" class="btn btn-primary">Search</button>
+                <!-- Search Bar -->
+                <form method="get" class="mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" name="search" class="form-control" 
+                                       placeholder="Search by name, position, organization, unit, or proposed replacement..." 
+                                       value="{{ current_search }}">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            {% if current_search %}
+                            <a href="?{% if current_status != 'all' %}status={{ current_status }}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Clear Search
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        {% if current_search %}
-                        <a href="?{% if current_status != 'incomplete' %}status={{ current_status }}{% endif %}" 
-                           class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i> Clear Search
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <!-- Preserve current status filter -->
-                {% if current_status != 'incomplete' %}
-                <input type="hidden" name="status" value="{{ current_status }}">
-                {% endif %}
-            </form>
+                    <!-- Preserve current status filter -->
+                    {% if current_status != 'all' %}
+                    <input type="hidden" name="status" value="{{ current_status }}">
+                    {% endif %}
+                </form>
             
             <!-- Status Filter Buttons -->
             <div class="btn-group flex-wrap" role="group" aria-label="Status filters">
-                <a href="?status=incomplete{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'incomplete' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                    <i class="fas fa-clock"></i> Incomplete ({{ incomplete_count }})
-                </a>
                 <a href="?status=pending{% if current_search %}&search={{ current_search }}{% endif %}" 
                    class="btn {% if current_status == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
                     <i class="fas fa-hourglass-half"></i> Pending ({{ pending_count }})
@@ -58,10 +54,6 @@
                 <a href="?status=approved{% if current_search %}&search={{ current_search }}{% endif %}" 
                    class="btn {% if current_status == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
                     <i class="fas fa-check"></i> Approved ({{ approved_count }})
-                </a>
-                <a href="?status=in_progress{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'in_progress' %}btn-info{% else %}btn-outline-info{% endif %}">
-                    <i class="fas fa-play"></i> In Progress ({{ in_progress_count }})
                 </a>
                 <a href="?status=completed{% if current_search %}&search={{ current_search }}{% endif %}" 
                    class="btn {% if current_status == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">

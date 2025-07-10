@@ -271,15 +271,10 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
         # Status filtering
         status_filter = self.request.GET.get('status')
         
-        if status_filter == 'incomplete':
-            # Default filter: not completed and not LCR Updated
-            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED'])
-        elif status_filter == 'pending':
+        if status_filter == 'pending':
             queryset = queryset.filter(status='PENDING')
         elif status_filter == 'approved':
             queryset = queryset.filter(status='APPROVED')
-        elif status_filter == 'in_progress':
-            queryset = queryset.filter(status='IN_PROGRESS')
         elif status_filter == 'completed':
             queryset = queryset.filter(status='COMPLETED')
         elif status_filter == 'lcr_updated':
@@ -292,8 +287,8 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
             # Show all callings
             pass
         else:
-            # Default: show incomplete callings (not completed or LCR updated)
-            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED'])
+            # Default: show all callings
+            pass
         
         return queryset.order_by('unit__name', 'organization__name', 'position__title')
     
@@ -315,10 +310,8 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
             )
         
         # Status counts
-        context['incomplete_count'] = all_callings.exclude(status__in=['COMPLETED', 'LCR_UPDATED']).count()
         context['pending_count'] = all_callings.filter(status='PENDING').count()
         context['approved_count'] = all_callings.filter(status='APPROVED').count()
-        context['in_progress_count'] = all_callings.filter(status='IN_PROGRESS').count()
         context['completed_count'] = all_callings.filter(status='COMPLETED').count()
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
@@ -326,7 +319,7 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
         context['all_count'] = all_callings.count()
         
         # Current filter for template
-        context['current_status'] = self.request.GET.get('status', 'incomplete')
+        context['current_status'] = self.request.GET.get('status', 'all')
         context['current_search'] = search or ''
         
         context['headers'] = ['Unit', 'Organization', 'Position', 'Currently Serving', 'Proposed Replacement', 'Status']
@@ -356,14 +349,10 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
         # Status filtering (same logic as main list)
         status_filter = self.request.GET.get('status')
         
-        if status_filter == 'incomplete':
-            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED'])
-        elif status_filter == 'pending':
+        if status_filter == 'pending':
             queryset = queryset.filter(status='PENDING')
         elif status_filter == 'approved':
             queryset = queryset.filter(status='APPROVED')
-        elif status_filter == 'in_progress':
-            queryset = queryset.filter(status='IN_PROGRESS')
         elif status_filter == 'completed':
             queryset = queryset.filter(status='COMPLETED')
         elif status_filter == 'lcr_updated':
@@ -375,8 +364,8 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
         elif status_filter == 'all':
             pass
         else:
-            # Default: show incomplete callings
-            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED'])
+            # Default: show all callings
+            pass
         
         return queryset.order_by('unit__name', 'organization__name', 'position__title')
     
@@ -406,17 +395,15 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
                 Q(proposed_replacement__icontains=search)
             )
         
-        context['incomplete_count'] = all_callings.exclude(status__in=['COMPLETED', 'LCR_UPDATED']).count()
         context['pending_count'] = all_callings.filter(status='PENDING').count()
         context['approved_count'] = all_callings.filter(status='APPROVED').count()
-        context['in_progress_count'] = all_callings.filter(status='IN_PROGRESS').count()
         context['completed_count'] = all_callings.filter(status='COMPLETED').count()
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
         context['on_hold_count'] = all_callings.filter(status='ON_HOLD').count()
         context['all_count'] = all_callings.count()
         
-        context['current_status'] = self.request.GET.get('status', 'incomplete')
+        context['current_status'] = self.request.GET.get('status', 'all')
         context['current_search'] = search or ''
         
         return context
