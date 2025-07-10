@@ -107,8 +107,7 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                         <button type="submit" class="btn btn-sm btn-outline-info"
-                                                data-bs-toggle="tooltip" title="Mark as LCR Updated"
-                                                onclick="return confirm('Mark this calling as LCR Updated?')">
+                                                data-bs-toggle="tooltip" title="Mark as LCR Updated">
                                             <i class="fas fa-sync"></i>
                                         </button>
                                     </form>
