@@ -116,15 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteReason.addEventListener('input', updateDeleteButton);
         }
         
-        // Add confirmation before submitting
+        // Validate required fields on form submit
         const form = document.querySelector('form');
         if (form) {
             form.addEventListener('submit', function(e) {
-                if (!confirm('Are you absolutely sure you want to permanently delete this calling record? This action cannot be undone.')) {
-                    e.preventDefault();
-                    return false;
-                }
-                
                 // Validate required fields
                 if (deleteReason && !deleteReason.value.trim()) {
                     e.preventDefault();

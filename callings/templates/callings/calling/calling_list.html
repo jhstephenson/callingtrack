@@ -198,15 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
     
-    // Confirm before delete
-    var deleteButtons = document.querySelectorAll('.btn-outline-danger');
-    deleteButtons.forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this calling? This action cannot be undone.')) {
-                e.preventDefault();
-            }
-        });
-    });
 });
 </script>
 {% endblock %}
