@@ -24,14 +24,9 @@ urlpatterns = [
     # Dashboard
     path('', callings_views.dashboard, name='dashboard'),
     
-    # Profile
-    path('profile/', callings_views.profile, name='profile'),
-    
     # Include app URLs
     path('callings/', include('callings.urls')),
     
-    # Redirect root to dashboard
-    path('', RedirectView.as_view(url='/', permanent=True)),
 ]
 
 # Serve media files in development

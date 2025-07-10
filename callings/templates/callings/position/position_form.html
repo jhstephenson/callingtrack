@@ -22,34 +22,18 @@
                         </div>
                         {% endif %}
                         
-                        <div class="row mb-3">
-                            <div class="col-md-8">
-                                <label for="{{ form.title.id_for_label }}" class="form-label">
-                                    {{ form.title.label }}
-                                    <span class="text-danger">*</span>
-                                </label>
-                                {{ form.title }}
-                                {% if form.title.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.title.errors.0 }}
-                                    </div>
-                                {% endif %}
-                                <div class="form-text">{{ form.title.help_text }}</div>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label for="{{ form.organization.id_for_label }}" class="form-label">
-                                    {{ form.organization.label }}
-                                    <span class="text-danger">*</span>
-                                </label>
-                                {{ form.organization }}
-                                {% if form.organization.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.organization.errors.0 }}
-                                    </div>
-                                {% endif %}
-                                <div class="form-text">{{ form.organization.help_text }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                {{ form.title.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.title.help_text }}</div>
                         </div>
                         
                         <div class="row mb-3">
@@ -111,7 +95,7 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% if form.instance.pk %}{% url 'position-detail' form.instance.pk %}{% else %}{% url 'position-list' %}{% endif %}" 
+                            <a href="{% if form.instance.pk %}{% url 'callings:position-detail' form.instance.pk %}{% else %}{% url 'callings:position-list' %}{% endif %}" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
@@ -145,15 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, false);
     });
     
-    // Initialize select2 for organization field if available
-    if (document.getElementById('{{ form.organization.id_for_label }}')) {
-        // You can add select2 initialization here if needed
-        // Example:
-        // $('#{{ form.organization.id_for_label }}').select2({
-        //     placeholder: 'Select an organization',
-        //     allowClear: true
-        // });
-    }
+    // Additional JavaScript for position form can be added here
 });
 </script>
 {% endblock %}

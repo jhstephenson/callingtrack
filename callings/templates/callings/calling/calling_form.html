@@ -22,116 +22,84 @@
                         </div>
                         {% endif %}
                         
+                        <!-- Calling Section -->
+                        <h5 class="mb-3">Calling</h5>
                         <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h5 class="mb-3">Member Information</h5>
-                                <div class="mb-3">
-                                    <label for="{{ form.member.id_for_label }}" class="form-label">
-                                        {{ form.member.label }} <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.member }}
-                                    {% if form.member.errors %}
+                            <div class="col-md-4">
+                                <label for="{{ form.unit.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.unit.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div>
+                                    {{ form.unit }}
+                                    {% if form.unit.errors %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form.member.errors.0 }}
+                                            {{ form.unit.errors.0 }}
                                         </div>
                                     {% endif %}
-                                    <div class="form-text">
-                                        <a href="{% url 'member-create' %}?next={{ request.path|urlencode }}" class="text-decoration-none">
-                                            <i class="fas fa-plus-circle"></i> Add new member
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Current Callings</label>
-                                    <div id="current-callings" class="border rounded p-2" style="min-height: 50px;">
-                                        <div class="text-center text-muted py-3" id="no-callings-msg">
-                                            <i class="fas fa-user-check fa-2x mb-2"></i>
-                                            <p class="mb-0">No current callings</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-text">Current callings for the selected member</div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <h5 class="mb-3">Position Information</h5>
-                                <div class="mb-3">
-                                    <label for="{{ form.position.id_for_label }}" class="form-label">
-                                        {{ form.position.label }} <span class="text-danger">*</span>
-                                    </label>
+                            <div class="col-md-4">
+                                <label for="{{ form.organization.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.organization.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div>
+                                    {{ form.organization }}
+                                    {% if form.organization.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.organization.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.position.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.position.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div>
                                     {{ form.position }}
                                     {% if form.position.errors %}
                                         <div class="invalid-feedback d-block">
                                             {{ form.position.errors.0 }}
                                         </div>
                                     {% endif %}
-                                    <div class="form-text">
-                                        <a href="{% url 'position-create' %}?next={{ request.path|urlencode }}" class="text-decoration-none">
-                                            <i class="fas fa-plus-circle"></i> Add new position
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Position Details</label>
-                                    <div id="position-details" class="border rounded p-3">
-                                        <div class="text-center text-muted">
-                                            <i class="fas fa-info-circle"></i> Select a position to view details
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <h5 class="mb-3">Calling Timeline</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.date_called.id_for_label }}" class="form-label">
-                                        {{ form.date_called.label }} <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.date_called }}
-                                    {% if form.date_called.errors %}
+                        <!-- Currently Serving Section -->
+                        <h5 class="mb-3">Currently Serving</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.name.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form.date_called.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.date_sustained.id_for_label }}" class="form-label">
-                                        {{ form.date_sustained.label }}
-                                    </label>
-                                    {{ form.date_sustained }}
-                                    {% if form.date_sustained.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.date_sustained.errors.0 }}
+                                            {{ form.name.errors.0 }}
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.date_set_apart.id_for_label }}" class="form-label">
-                                        {{ form.date_set_apart.label }}
-                                    </label>
-                                    {{ form.date_set_apart }}
-                                    {% if form.date_set_apart.errors %}
+                            <div class="col-md-4">
+                                <label for="{{ form.released_by.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.released_by.label }}
+                                </label>
+                                <div>
+                                    {{ form.released_by }}
+                                    {% if form.released_by.errors %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form.date_set_apart.errors.0 }}
+                                            {{ form.released_by.errors.0 }}
                                         </div>
                                     {% endif %}
-                                    <div id="setting-apart-help" class="form-text d-none">
-                                        <i class="fas fa-info-circle"></i> This position requires setting apart
-                                    </div>
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.date_released.id_for_label }}" class="form-label">
-                                        {{ form.date_released.label }}
-                                    </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.date_released.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.date_released.label }}
+                                </label>
+                                <div>
                                     {{ form.date_released }}
                                     {% if form.date_released.errors %}
                                         <div class="invalid-feedback d-block">
@@ -142,70 +110,151 @@
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <!-- Proposed Replacement Section -->
+                        <h5 class="mb-3">Proposed Replacement</h5>
+                        <div class="row mb-4">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.calling_approval_status.id_for_label }}" class="form-label">
-                                        {{ form.calling_approval_status.label }}
-                                    </label>
-                                    {{ form.calling_approval_status }}
-                                    {% if form.calling_approval_status.errors %}
+                                <label for="{{ form.proposed_replacement.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.proposed_replacement.label }}
+                                </label>
+                                <div>
+                                    {{ form.proposed_replacement }}
+                                    {% if form.proposed_replacement.errors %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form.calling_approval_status.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.sustaining_approval_status.id_for_label }}" class="form-label">
-                                        {{ form.sustaining_approval_status.label }}
-                                    </label>
-                                    {{ form.sustaining_approval_status }}
-                                    {% if form.sustaining_approval_status.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.sustaining_approval_status.errors.0 }}
+                                            {{ form.proposed_replacement.errors.0 }}
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
-                            
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.setting_apart_approval_status.id_for_label }}" class="form-label">
-                                        {{ form.setting_apart_approval_status.label }}
-                                    </label>
-                                    {{ form.setting_apart_approval_status }}
-                                    {% if form.setting_apart_approval_status.errors %}
+                                <label for="{{ form.home_unit.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.home_unit.label }}
+                                </label>
+                                <div>
+                                    {{ form.home_unit }}
+                                    {% if form.home_unit.errors %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form.setting_apart_approval_status.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.released_approval_status.id_for_label }}" class="form-label">
-                                        {{ form.released_approval_status.label }}
-                                    </label>
-                                    {{ form.released_approval_status }}
-                                    {% if form.released_approval_status.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.released_approval_status.errors.0 }}
+                                            {{ form.home_unit.errors.0 }}
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <label for="{{ form.status.id_for_label }}" class="form-label">
-                                {{ form.status.label }} <span class="text-danger">*</span>
-                            </label>
-                            {{ form.status }}
-                            {% if form.status.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.status.errors.0 }}
+                        <!-- Approval Status Section -->
+                        <h5 class="mb-3">Approval Status</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="{{ form.presidency_approved.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.presidency_approved.label }}
+                                </label>
+                                <div>
+                                    {{ form.presidency_approved }}
+                                    {% if form.presidency_approved.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.presidency_approved.errors.0 }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.bishop_consulted_by.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.bishop_consulted_by.label }}
+                                </label>
+                                <div>
+                                    {{ form.bishop_consulted_by }}
+                                    {% if form.bishop_consulted_by.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.bishop_consulted_by.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.hc_approved.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.hc_approved.label }}
+                                </label>
+                                <div>
+                                    {{ form.hc_approved }}
+                                    {% if form.hc_approved.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.hc_approved.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calling Status Section -->
+                        <h5 class="mb-3">Calling Status</h5>
+                        
+                        <!-- Date Called and Called By on same line -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.date_called.id_for_label }}" class="form-label">
+                                    {{ form.date_called.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.date_called }}
+                                {% if form.date_called.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.date_called.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.called_by.id_for_label }}" class="form-label">
+                                    {{ form.called_by.label }}
+                                </label>
+                                {{ form.called_by }}
+                                {% if form.called_by.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.called_by.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Date Sustained and Date Set Apart on same line -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.date_sustained.id_for_label }}" class="form-label">
+                                    {{ form.date_sustained.label }}
+                                </label>
+                                {{ form.date_sustained }}
+                                {% if form.date_sustained.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.date_sustained.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.date_set_apart.id_for_label }}" class="form-label">
+                                    {{ form.date_set_apart.label }}
+                                </label>
+                                {{ form.date_set_apart }}
+                                {% if form.date_set_apart.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.date_set_apart.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Status at bottom -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">
+                                    {{ form.status.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="mb-4">
@@ -221,7 +270,7 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% if form.instance.pk %}{% url 'calling-detail' form.instance.pk %}{% else %}{% url 'calling-list' %}{% endif %}" 
+                            <a href="{% if form.instance.pk %}{% url 'callings:calling-detail' form.instance.pk %}{% else %}{% url 'callings:calling-list' %}{% endif %}" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
@@ -315,70 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Handle member selection to show current callings
-    const memberSelect = document.getElementById('{{ form.member.id_for_label }}');
-    const currentCallings = document.getElementById('current-callings');
-    const noCallingsMsg = document.getElementById('no-callings-msg');
-    
-    if (memberSelect) {
-        memberSelect.addEventListener('change', function() {
-            const memberId = this.value;
-            if (memberId) {
-                // In a real app, you would fetch member's current callings via AJAX
-                // This is a simplified example
-                fetch(`/api/members/${memberId}/current-callings/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            noCallingsMsg.classList.add('d-none');
-                            let callingsHtml = '<ul class="list-unstyled mb-0">';
-                            
-                            data.forEach(calling => {
-                                callingsHtml += `
-                                    <li class="mb-2">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>${calling.position.title}</strong><br>
-                                                <small class="text-muted">
-                                                    ${calling.position.organization.name} (${calling.position.organization.unit.name})
-                                                </small>
-                                            </div>
-                                            <span class="badge bg-${calling.status_badge_class} ms-2">
-                                                ${calling.status_display}
-                                            </span>
-                                        </div>
-                                    </li>
-                                `;
-                            });
-                            
-                            callingsHtml += '</ul>';
-                            currentCallings.innerHTML = callingsHtml;
-                        } else {
-                            noCallingsMsg.classList.remove('d-none');
-                            currentCallings.innerHTML = '';
-                            currentCallings.appendChild(noCallingsMsg);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching member callings:', error);
-                        currentCallings.innerHTML = `
-                            <div class="alert alert-warning mb-0">
-                                <i class="fas fa-exclamation-triangle"></i> Could not load current callings.
-                            </div>
-                        `;
-                    });
-            } else {
-                noCallingsMsg.classList.remove('d-none');
-                currentCallings.innerHTML = '';
-                currentCallings.appendChild(noCallingsMsg);
-            }
-        });
-        
-        // Trigger change event if a member is already selected
-        if (memberSelect.value) {
-            memberSelect.dispatchEvent(new Event('change'));
-        }
-    }
+    // Member selection functionality has been simplified since we now use a name field
     
     // Initialize date pickers
     const dateFields = [
@@ -433,12 +419,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Check that released date is after called date if both exist
-            if (releasedDate && calledDate && releasedDate < calledDate) {
-                alert('Released date cannot be before called date');
-                dateReleased.focus();
-                isValid = false;
-            }
             
             if (!isValid) {
                 e.preventDefault();

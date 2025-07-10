@@ -7,10 +7,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ object.name }} <small class="text-muted">Organization</small></h1>
         <div class="btn-group" role="group">
-            <a href="{% url 'organization-update' object.pk %}" class="btn btn-outline-secondary">
+            <a href="{% url 'callings:organization-update' object.pk %}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{% url 'organization-delete' object.pk %}" class="btn btn-outline-danger">
+            <a href="{% url 'callings:organization-delete' object.pk %}" class="btn btn-outline-danger">
                 <i class="fas fa-trash"></i> Delete
             </a>
         </div>
@@ -29,17 +29,19 @@
                         
                         <dt class="col-sm-3">Unit</dt>
                         <dd class="col-sm-9">
-                            <a href="{% url 'unit-detail' object.unit.pk %}">
+                            {% if object.unit %}
+                            <a href="{% url 'callings:unit-detail' object.unit.pk %}">
                                 {{ object.unit.name }}
                             </a>
+                            {% else %}
+                            <span class="text-muted">No unit assigned</span>
+                            {% endif %}
                         </dd>
                         
                         {% if object.leader %}
                         <dt class="col-sm-3">Leader</dt>
                         <dd class="col-sm-9">
-                            <a href="{% url 'member-detail' object.leader.pk %}">
-                                {{ object.leader.get_full_name }}
-                            </a>
+                            {{ object.leader }}
                         </dd>
                         {% endif %}
                         
@@ -62,7 +64,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Positions ({{ positions|length }})</h5>
-                        <a href="{% url 'position-create' %}?organization={{ object.pk }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'callings:position-create' %}?organization={{ object.pk }}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-plus"></i> Add Position
                         </a>
                     </div>
@@ -71,7 +73,7 @@
                     {% if positions %}
                     <div class="list-group list-group-flush">
                         {% for position in positions %}
-                        <a href="{% url 'position-detail' position.pk %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'callings:position-detail' position.pk %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">{{ position.title }}</h6>
                                 <small class="text-muted">
@@ -79,13 +81,7 @@
                                     {% if position.requires_setting_apart %}<span class="badge bg-warning">Requires Setting Apart</span>{% endif %}
                                 </small>
                             </div>
-                            <small class="text-muted">
-                                {% if position.current_calling %}
-                                    Filled by: {{ position.current_calling.member.get_full_name }}
-                                {% else %}
-                                    Vacant
-                                {% endif %}
-                            </small>
+                            <small class="text-muted">Vacant</small>
                         </a>
                         {% endfor %}
                     </div>
@@ -93,7 +89,7 @@
                     <div class="text-center p-4 text-muted">
                         <i class="fas fa-inbox fa-2x mb-2"></i>
                         <p class="mb-0">No positions found for this organization.</p>
-                        <a href="{% url 'position-create' %}?organization={{ object.pk }}" class="btn btn-primary mt-2">
+                        <a href="{% url 'callings:position-create' %}?organization={{ object.pk }}" class="btn btn-primary mt-2">
                             <i class="fas fa-plus"></i> Add Position
                         </a>
                     </div>
@@ -109,14 +105,14 @@
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
                         {% for calling in callings %}
-                        <a href="{% url 'calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'callings:calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">{{ calling.position.title }}</h6>
                                 <span class="badge bg-{{ calling.get_status_badge_class }}">
                                     {{ calling.get_status_display }}
                                 </span>
                             </div>
-                            <p class="mb-1">{{ calling.member.get_full_name }}</p>
+                            <p class="mb-1">{{ calling.name }}</p>
                             <small class="text-muted">
                                 Called on {{ calling.date_called|date:"M d, Y" }}
                                 {% if calling.date_sustained %}

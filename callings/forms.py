@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, DateInput
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from .models import Unit, Organization, Position, Member, Calling
+from .models import Unit, Organization, Position, Calling
 
 class UnitForm(ModelForm):
     class Meta:
@@ -28,39 +28,22 @@ class OrganizationForm(ModelForm):
 class PositionForm(ModelForm):
     class Meta:
         model = Position
-        fields = ['title', 'organization', 'description', 'is_active', 'is_leadership', 'requires_setting_apart']
+        fields = ['title', 'description', 'is_active', 'is_leadership', 'requires_setting_apart']
         widgets = {
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_leadership': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'requires_setting_apart': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-class MemberForm(ModelForm):
-    class Meta:
-        model = Member
-        fields = [
-            'first_name', 'last_name', 'middle_name', 'suffix', 'gender',
-            'birth_date', 'phone', 'address', 'city', 'state',
-            'zip_code', 'membership_status', 'is_active'
-        ]
-        widgets = {
-            'birth_date': DateInput(attrs={'type': 'date'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
 
 class CallingForm(ModelForm):
     class Meta:
         model = Calling
         fields = [
-            'member', 'position', 'unit', 'calling_status', 'date_called',
+            'name', 'unit', 'organization', 'position', 'status', 'date_called',
             'date_sustained', 'date_set_apart', 'date_released',
-            'calling_approval_status', 'sustaining_approval_status',
-            'setting_apart_approval_status', 'released_approval_status',
+            'called_by', 'released_by', 'proposed_replacement', 'home_unit',
+            'bishop_consulted_by', 'presidency_approved', 'hc_approved',
             'notes', 'is_active'
         ]
         widgets = {
@@ -68,20 +51,23 @@ class CallingForm(ModelForm):
             'date_sustained': DateInput(attrs={'type': 'date'}),
             'date_set_apart': DateInput(attrs={'type': 'date'}),
             'date_released': DateInput(attrs={'type': 'date'}),
+            'presidency_approved': DateInput(attrs={'type': 'date'}),
+            'hc_approved': DateInput(attrs={'type': 'date'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'notes': forms.Textarea(attrs={'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['member'].required = True
-        self.fields['position'].required = True
+        self.fields['name'].required = True
         self.fields['unit'].required = True
+        self.fields['organization'].required = True
+        self.fields['position'].required = True
         self.fields['date_called'].required = True
         
         # Set initial status if creating a new calling
         if not self.instance.pk:
-            self.fields['calling_status'].initial = 'ACTIVE'
+            self.fields['status'].initial = 'IN_PROGRESS'
             
     def clean(self):
         cleaned_data = super().clean()
@@ -89,7 +75,6 @@ class CallingForm(ModelForm):
         date_sustained = cleaned_data.get('date_sustained')
         date_set_apart = cleaned_data.get('date_set_apart')
         date_released = cleaned_data.get('date_released')
-        calling_status = cleaned_data.get('calling_status')
         
         # Validate date order
         if date_sustained and date_called and date_sustained < date_called:
@@ -98,22 +83,12 @@ class CallingForm(ModelForm):
         if date_set_apart and date_sustained and date_set_apart < date_sustained:
             self.add_error('date_set_apart', 'Set apart date cannot be before sustained date')
             
-        if date_released and date_called and date_released < date_called:
-            self.add_error('date_released', 'Released date cannot be before called date')
-            
-        # Validate status based on dates
-        if calling_status == 'ACTIVE' and date_released:
-            self.add_error('calling_status', 'Active callings cannot have a release date')
-            
-        if calling_status == 'RELEASED' and not date_released:
-            self.add_error('date_released', 'Released callings must have a release date')
-            
         return cleaned_data
 
 class CallingReleaseForm(ModelForm):
     class Meta:
         model = Calling
-        fields = ['date_released', 'release_notes']
+        fields = ['date_released', 'released_by', 'release_notes']
         widgets = {
             'date_released': DateInput(attrs={'type': 'date'}),
             'release_notes': forms.Textarea(attrs={'rows': 3}),

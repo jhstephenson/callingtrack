@@ -27,13 +27,6 @@ urlpatterns = [
     path('positions/<int:pk>/update/', views.PositionUpdateView.as_view(), name='position-update'),
     path('positions/<int:pk>/delete/', views.PositionDeleteView.as_view(), name='position-delete'),
     
-    # Member URLs
-    path('members/', views.MemberListView.as_view(), name='member-list'),
-    path('members/<int:pk>/', views.MemberDetailView.as_view(), name='member-detail'),
-    path('members/create/', views.MemberCreateView.as_view(), name='member-create'),
-    path('members/<int:pk>/update/', views.MemberUpdateView.as_view(), name='member-update'),
-    path('members/<int:pk>/delete/', views.MemberDeleteView.as_view(), name='member-delete'),
-    
     # Calling URLs
     path('callings/', views.CallingListView.as_view(), name='calling-list'),
     path('callings/<int:pk>/', views.CallingDetailView.as_view(), name='calling-detail'),

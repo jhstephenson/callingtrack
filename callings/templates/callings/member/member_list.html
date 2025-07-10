@@ -1,8 +1,8 @@
 {% extends 'callings/_list.html' %}
 
 {% block content %}
-{% with title='Members' create_url='member-create' update_url='member-update' delete_url='member-delete' %}
-{% with headers='Name,Unit,Callings,Contact'|split:',' %}
+{% with title='Members' create_url='callings:member-create' update_url='callings:member-update' delete_url='callings:member-delete' %}
+{% with headers=headers %}
 {{ block.super }}
 {% endwith %}
 {% endwith %}

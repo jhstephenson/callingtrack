@@ -1,8 +1,8 @@
 {% extends 'callings/_list.html' %}
 
 {% block content %}
-{% with title='Positions' create_url='position-create' update_url='position-update' delete_url='position-delete' %}
-{% with headers='Title,Organization,Current Holder,Status'|split:',' %}
+{% with title='Positions' create_url='callings:position-create' update_url='callings:position-update' delete_url='callings:position-delete' %}
+{% with headers=headers %}
 {{ block.super }}
 {% endwith %}
 {% endwith %}

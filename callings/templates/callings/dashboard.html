@@ -28,21 +28,6 @@
         </div>
     </div>
     
-    <div class="col-md-6 col-lg-3">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase text-muted mb-0">Total Members</h6>
-                        <h2 class="mb-0">{{ total_members|intcomma }}</h2>
-                    </div>
-                    <div class="bg-success bg-opacity-10 p-3 rounded">
-                        <i class="fas fa-users fa-2x text-success"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <div class="col-md-6 col-lg-3">
         <div class="card stat-card">
@@ -83,7 +68,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Recent Callings</h5>
-                <a href="{% url 'calling-list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="{% url 'callings:calling-list' %}" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -101,12 +86,10 @@
                             {% for calling in recent_callings %}
                             <tr>
                                 <td>
-                                    <a href="{% url 'member-detail' calling.member.id %}">
-                                        {{ calling.member.name }}
-                                    </a>
+                                    {{ calling.name }}
                                 </td>
                                 <td>
-                                    <a href="{% url 'position-detail' calling.position.id %}">
+                                    <a href="{% url 'callings:position-detail' calling.position.id %}">
                                         {{ calling.position.title }}
                                     </a>
                                 </td>
@@ -144,7 +127,7 @@
                     {% for calling in upcoming_callings %}
                     <div class="list-group-item">
                         <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ calling.member.name }}</h6>
+                            <h6 class="mb-1">{{ calling.name }}</h6>
                             <small class="text-muted">
                                 {% if calling.date_called %}{{ calling.date_called|date:"M d" }}{% endif %}
                                 {% if calling.date_sustained %}<i class="fas fa-arrow-right mx-1"></i>{% endif %}

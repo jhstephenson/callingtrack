@@ -7,10 +7,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ object.title }} <small class="text-muted">Position</small></h1>
         <div class="btn-group" role="group">
-            <a href="{% url 'position-update' object.pk %}" class="btn btn-outline-secondary">
+            <a href="{% url 'callings:position-update' object.pk %}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="{% url 'position-delete' object.pk %}" class="btn btn-outline-danger">
+            <a href="{% url 'callings:position-delete' object.pk %}" class="btn btn-outline-danger">
                 <i class="fas fa-trash"></i> Delete
             </a>
         </div>
@@ -26,14 +26,6 @@
                     <dl class="row">
                         <dt class="col-sm-3">Title</dt>
                         <dd class="col-sm-9">{{ object.title }}</dd>
-                        
-                        <dt class="col-sm-3">Organization</dt>
-                        <dd class="col-sm-9">
-                            <a href="{% url 'organization-detail' object.organization.pk %}">
-                                {{ object.organization.name }}
-                            </a>
-                            <span class="text-muted">({{ object.organization.unit.name }})</span>
-                        </dd>
                         
                         <dt class="col-sm-3">Status</dt>
                         <dd class="col-sm-9">
@@ -70,8 +62,8 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h5 class="mb-1">
-                                <a href="{% url 'member-detail' current_calling.member.pk %}">
-                                    {{ current_calling.member.get_full_name }}
+                                <a href="{% url 'callings:calling-detail' current_calling.pk %}">
+                                    {{ current_calling.name }}
                                 </a>
                             </h5>
                             <p class="mb-1">
@@ -90,7 +82,7 @@
                             </p>
                         </div>
                         <div class="flex-shrink-0">
-                            <a href="{% url 'calling-detail' current_calling.pk %}" class="btn btn-outline-primary">
+                            <a href="{% url 'callings:calling-detail' current_calling.pk %}" class="btn btn-outline-primary">
                                 <i class="fas fa-eye"></i> View Calling
                             </a>
                         </div>
@@ -103,7 +95,7 @@
                     <i class="fas fa-user-times fa-3x text-muted mb-3"></i>
                     <h5>This position is currently vacant</h5>
                     <p class="text-muted">There is no active calling for this position.</p>
-                    <a href="{% url 'calling-create' %}?position={{ object.pk }}" class="btn btn-primary">
+                    <a href="{% url 'callings:calling-create' %}?position={{ object.pk }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Create New Calling
                     </a>
                 </div>
@@ -118,9 +110,9 @@
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
                         {% for calling in past_callings %}
-                        <a href="{% url 'calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'callings:calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ calling.member.get_full_name }}</h6>
+                                <h6 class="mb-1">{{ calling.name }}</h6>
                                 <span class="badge bg-{{ calling.get_status_badge_class }}">
                                     {{ calling.get_status_display }}
                                 </span>

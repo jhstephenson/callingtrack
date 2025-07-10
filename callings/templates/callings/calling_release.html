@@ -1,0 +1,48 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}{{ title }} - CallingTrack{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ title }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <p><strong>Member:</strong> {{ calling.name }}</p>
+                        <p><strong>Position:</strong> {{ calling.position.title }}</p>
+                        <p><strong>Unit:</strong> {{ calling.unit.name }}</p>
+                        <p><strong>Date Called:</strong> {{ calling.date_called|date:"M d, Y"|default:"-" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.date_released.id_for_label }}" class="form-label">{{ form.date_released.label }}</label>
+                        {{ form.date_released }}
+                        {% if form.date_released.errors %}
+                            <div class="text-danger">{{ form.date_released.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.release_notes.id_for_label }}" class="form-label">{{ form.release_notes.label }}</label>
+                        {{ form.release_notes }}
+                        {% if form.release_notes.errors %}
+                            <div class="text-danger">{{ form.release_notes.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'callings:calling-detail' calling.pk %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning">Release Calling</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

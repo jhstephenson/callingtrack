@@ -20,7 +20,7 @@
                                     <i class="fas fa-user-circle fa-3x text-muted"></i>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h5 class="mb-1">{{ object.member.get_full_name }}</h5>
+                                    <h5 class="mb-1">{{ object.name }}</h5>
                                     <p class="mb-1">
                                         <strong>{{ object.position.title }}</strong>
                                         <span class="text-muted">({{ object.position.organization.name }})</span>
@@ -42,7 +42,7 @@
                         <h5><i class="fas fa-exclamation-triangle"></i> Warning</h5>
                         <p>This action cannot be undone. The following information will be permanently deleted:</p>
                         <ul>
-                            <li>Calling record for {{ object.member.get_full_name }} as {{ object.position.title }}</li>
+                            <li>Calling record for {{ object.name }} as {{ object.position.title }}</li>
                             <li>All associated dates (called, sustained, set apart, released)</li>
                             <li>All approval statuses and notes</li>
                         </ul>
@@ -77,7 +77,7 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'calling-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
+                            <a href="{% url 'callings:calling-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left"></i> Back to Calling
                             </a>
                             <button type="submit" class="btn btn-danger" id="delete-button">

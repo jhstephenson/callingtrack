@@ -28,13 +28,25 @@ class Unit(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_unit_type_display()})"
+    
+    def get_list_display(self):
+        return [
+            self.name,
+            self.get_unit_type_display(),
+            self.parent_unit.name if self.parent_unit else 'No Parent',
+            self.meeting_time.strftime('%I:%M %p') if self.meeting_time else 'No Time Set',
+            'Active' if self.is_active else 'Inactive'
+        ]
+    
+    def get_absolute_url(self):
+        return reverse('callings:unit-detail', kwargs={'pk': self.pk})
 
 
 class Organization(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='organizations', null=True, blank=True)
-    leader = models.ForeignKey('Member', on_delete=models.SET_NULL, null=True, blank=True, related_name='led_organizations')
+    leader = models.CharField(max_length=200, blank=True, null=True)
     is_active = models.BooleanField(default=True, help_text="Whether this organization is currently active")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -44,11 +56,21 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_list_display(self):
+        return [
+            self.name,
+            self.unit.name if self.unit else 'No Unit',
+            self.leader or 'No Leader',
+            'Active' if self.is_active else 'Inactive'
+        ]
+    
+    def get_absolute_url(self):
+        return reverse('callings:organization-detail', kwargs={'pk': self.pk})
 
 
 class Position(models.Model):
-    title = models.CharField(max_length=100)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='positions')
+    title = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True, help_text="Description of the position's responsibilities")
     is_leadership = models.BooleanField(default=False, help_text="Whether this is a leadership position")
     is_active = models.BooleanField(default=True, help_text="Whether this position is currently active")
@@ -65,97 +87,26 @@ class Position(models.Model):
 
     class Meta:
         ordering = ['display_order', 'title']
-        unique_together = ['title', 'organization']
 
     def __str__(self):
-        return f"{self.title} - {self.organization.name}"
-
-
-class Member(models.Model):
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other'),
-        ('', 'Prefer not to say'),
-    ]
+        return self.title
     
-    MEMBERSHIP_STATUS_CHOICES = [
-        ('MEMBER', 'Member'),
-        ('NON_MEMBER', 'Non-Member'),
-        ('PROSPECTIVE', 'Prospective Member'),
-        ('OTHER', 'Other'),
-    ]
+    def get_current_holder(self):
+        """Get the current holder of this position"""
+        active_calling = self.callings.filter(calling_status='ACTIVE', is_active=True).first()
+        return active_calling.name if active_calling else None
     
-    # Name fields
-    first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100)
-    suffix = models.CharField(max_length=10, blank=True, null=True, help_text="e.g., Jr., Sr., III")
-    
-    # Personal information
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
-    profile_picture = models.ImageField(
-        upload_to='profile_pics/', 
-        blank=True, 
-        null=True,
-        help_text="Profile picture of the member"
-    )
-    
-    # Contact information
-    email = models.EmailField(blank=True, null=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
-    state = models.CharField(max_length=50, blank=True, null=True)
-    zip_code = models.CharField(max_length=15, blank=True, null=True)
-    
-    # Membership information
-    home_unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True, related_name='members')
-    membership_status = models.CharField(
-        max_length=20, 
-        choices=MEMBERSHIP_STATUS_CHOICES, 
-        default='MEMBER',
-        help_text="Membership status in the church"
-    )
-    is_active = models.BooleanField(
-        default=True, 
-        help_text="Whether this member is currently active in the unit"
-    )
-    
-    # System fields
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['last_name', 'first_name']
-        indexes = [
-            models.Index(fields=['last_name', 'first_name']),
-            models.Index(fields=['home_unit']),
-            models.Index(fields=['is_active']),
+    def get_list_display(self):
+        current_holder = self.get_current_holder()
+        return [
+            self.title,
+            current_holder or 'Vacant',
+            'Active' if self.is_active else 'Inactive'
         ]
+    
+    def get_absolute_url(self):
+        return reverse('callings:position-detail', kwargs={'pk': self.pk})
 
-    def __str__(self):
-        name_parts = [self.first_name]
-        if self.middle_name:
-            name_parts.append(self.middle_name)
-        name_parts.append(self.last_name)
-        if self.suffix:
-            name_parts.append(self.suffix)
-        return ' '.join(name_parts)
-        
-    @property
-    def full_name(self):
-        """Return the full name of the member."""
-        return str(self)
-        
-    @property
-    def age(self):
-        """Calculate and return the member's age based on birth date."""
-        if not self.birth_date:
-            return None
-        today = timezone.now().date()
-        return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
 
 class Calling(models.Model):
@@ -164,6 +115,7 @@ class Calling(models.Model):
         ('COMPLETED', 'Completed'),
         ('CANCELLED', 'Cancelled'),
         ('ON_HOLD', 'On Hold'),
+        ('LCR_UPDATED', 'LCR Updated'),
     ]
     
     CALLING_STATUS_CHOICES = [
@@ -179,10 +131,11 @@ class Calling(models.Model):
         ('DECLINED', 'Declined'),
     ]
     
-    # Core relationships
+    # Core relationships - all required
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='callings')
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name='callings')
     position = models.ForeignKey(Position, on_delete=models.PROTECT, related_name='callings')
-    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='callings')
+    name = models.CharField(max_length=200)
     
     # Status fields
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='IN_PROGRESS')
@@ -222,13 +175,29 @@ class Calling(models.Model):
     )
     
     # Approval details
-    called_by = models.ForeignKey(
-        Member, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+    called_by = models.CharField(
+        max_length=200, 
         blank=True, 
-        related_name='callings_made',
-        help_text="Member who extended the calling"
+        null=True,
+        help_text="Name of person who extended the calling"
+    )
+    released_by = models.CharField(
+        max_length=200, 
+        blank=True, 
+        null=True,
+        help_text="Name of person who released the calling"
+    )
+    proposed_replacement = models.CharField(
+        max_length=200, 
+        blank=True, 
+        null=True,
+        help_text="Name of the proposed replacement for this calling"
+    )
+    home_unit = models.CharField(
+        max_length=200, 
+        blank=True, 
+        null=True,
+        help_text="Home unit of the person (may differ from calling unit)"
     )
     presidency_approved = models.DateField(
         null=True, 
@@ -240,13 +209,11 @@ class Calling(models.Model):
         blank=True,
         help_text="Date when the high council approved the calling"
     )
-    bishop_consulted_by = models.ForeignKey(
-        Member, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+    bishop_consulted_by = models.CharField(
+        max_length=200, 
         blank=True, 
-        related_name='consulted_callings',
-        help_text="Bishop who was consulted for the calling"
+        null=True,
+        help_text="Name of bishop who was consulted for the calling"
     )
     
     # System fields
@@ -272,10 +239,51 @@ class Calling(models.Model):
         verbose_name_plural = 'Callings'
 
     def __str__(self):
-        return f"{self.member} - {self.position} in {self.unit}"
+        return f"{self.name} - {self.position} in {self.organization} ({self.unit})"
+
+    def get_list_display(self):
+        return [
+            self.unit,
+            self.organization,
+            self.position,
+            self.name,
+            self.proposed_replacement or '',
+            self.get_status_display()
+        ]
 
     def get_absolute_url(self):
-        return reverse('calling-detail', kwargs={'pk': self.pk})
+        return reverse('callings:calling-detail', kwargs={'pk': self.pk})
+    
+    def get_approval_status_class(self, approval_type):
+        """Return CSS class for approval status badges"""
+        status_map = {
+            'calling': self.calling_approval_status,
+            'sustaining': self.sustaining_approval_status,
+            'setting_apart': self.setting_apart_approval_status,
+            'released': self.released_approval_status,
+        }
+        
+        status = status_map.get(approval_type, 'PENDING')
+        
+        class_map = {
+            'PENDING': 'warning',
+            'APPROVED': 'success',
+            'NOT_REQUIRED': 'secondary',
+            'DECLINED': 'danger',
+        }
+        
+        return class_map.get(status, 'secondary')
+    
+    def get_status_badge_class(self):
+        """Return CSS class for status badges"""
+        status_map = {
+            'IN_PROGRESS': 'primary',
+            'COMPLETED': 'success',
+            'CANCELLED': 'danger',
+            'ON_HOLD': 'warning',
+            'LCR_UPDATED': 'info',
+        }
+        return status_map.get(self.status, 'secondary')
 
 
 class CallingHistory(models.Model):
@@ -287,8 +295,7 @@ class CallingHistory(models.Model):
     
     calling = models.ForeignKey(Calling, on_delete=models.CASCADE, related_name='history')
     action = models.CharField(max_length=10, choices=ACTION_CHOICES)
-    member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, related_name='calling_history')
-    # Changed by field moved after the User model import
+    member_name = models.CharField(max_length=200, blank=True, null=True)
     changed_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
     

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from callings.models import Unit, Organization, Position, Member, Calling
+from callings.models import Unit, Organization, Position, Calling
 
 class Command(BaseCommand):
     help = 'Import completed callings from a CSV file'
@@ -23,7 +23,6 @@ class Command(BaseCommand):
             'units_created': 0,
             'organizations_created': 0,
             'positions_created': 0,
-            'members_created': 0,
             'callings_created': 0,
             'callings_updated': 0,
         }
@@ -43,6 +42,15 @@ class Command(BaseCommand):
             # Get headers from the third row
             headers = [h.strip() for h in next(reader)]
             
+            # Expected column count (based on CSV structure)
+            expected_columns = 17
+            self.stdout.write(f"CSV has {len(headers)} columns, expecting {expected_columns}")
+            
+            # Print headers for debugging
+            self.stdout.write("Column headers:")
+            for idx, header in enumerate(headers):
+                self.stdout.write(f"  {idx}: {header}")
+            
             for i, row in enumerate(reader, 1):
                 if not any(row):  # Skip empty rows
                     continue
@@ -50,6 +58,10 @@ class Command(BaseCommand):
                 try:
                     # Convert empty strings to None
                     row = [cell.strip() if cell.strip() else None for cell in row]
+                    
+                    # Ensure row has enough columns
+                    if len(row) < expected_columns:
+                        row.extend([None] * (expected_columns - len(row)))
                     
                     # Update current unit if this row has one
                     if row[0]:  # Unit column
@@ -85,13 +97,12 @@ class Command(BaseCommand):
                         
                     position, created = Position.objects.get_or_create(
                         title=position_title,
-                        organization=org,
                         defaults={'is_leadership': any(role in position_title.lower() for role in ['president', 'bishop', 'counselor', 'secretary', 'clerk'])}
                     )
                     if created:
                         stats['positions_created'] += 1
                     
-                    # Get or create Member (Currently Called)
+                    # Get member name (Currently Called)
                     member_name = row[3]  # Currently Called column
                     
                     # Skip rows with empty or invalid member names
@@ -109,18 +120,6 @@ class Command(BaseCommand):
                         self.stdout.write(f"Skipping row {i}: Invalid member name (appears to be a date): {member_name}")
                         continue
                     
-                    try:
-                        member, created = Member.objects.get_or_create(
-                            name=member_name,
-                            defaults={'home_unit': unit}
-                        )
-                    except Exception as e:
-                        self.stderr.write(f"Error creating/updating member '{member_name}': {e}")
-                        stats['rows_skipped'] += 1
-                        continue
-                    if created:
-                        stats['members_created'] += 1
-                    
                     # Parse dates
                     def parse_date(date_str):
                         if not date_str:
@@ -136,41 +135,60 @@ class Command(BaseCommand):
                     # Create or update Calling
                     calling_data = {
                         'unit': unit,
+                        'organization': org,
                         'position': position,
-                        'member': member,
+                        'name': member_name,
                         'status': 'COMPLETED',  # Mark as completed
                         'calling_status': 'RELEASED',  # Mark as released
-                        'date_called': parse_date(row[12]),  # Date Called
-                        'date_sustained': parse_date(row[13]),  # Sustained
-                        'date_set_apart': parse_date(row[14]),  # Set Apart
+                        'date_called': parse_date(row[13]),  # Date Called
+                        'date_sustained': parse_date(row[14]),  # Sustained
+                        'date_set_apart': parse_date(row[15]),  # Set Apart
+                        'date_released': parse_date(row[5]),  # Date Released
                         'presidency_approved': parse_date(row[8]),  # Date Approved
-                        'hc_approved': parse_date(row[10]),  # Date Approved by HC
-                        'lcr_updated': row[15].lower() == 'true' if row[15] else False,  # LCR Updated
-                        'notes': f"Imported from completed callings. Released by: {row[4] or 'N/A'}",
+                        'hc_approved': parse_date(row[11]),  # Date Approved by HC
+                        'lcr_updated': row[16].lower() == 'true' if row[16] else False,  # LCR Updated
                     }
                     
+                    # Handle released_by if available
+                    released_by_name = row[4]  # Released By
+                    if released_by_name and released_by_name.lower() not in ['n/a', '']:
+                        calling_data['released_by'] = released_by_name.strip()
+                    
+                    # Handle proposed_replacement if available
+                    proposed_replacement_name = row[6]  # Proposed Replacement
+                    if proposed_replacement_name and proposed_replacement_name.lower() not in ['n/a', '']:
+                        calling_data['proposed_replacement'] = proposed_replacement_name.strip()
+                    
+                    # Handle home_unit if available
+                    home_unit_name = row[7]  # Home Unit
+                    if home_unit_name and home_unit_name.lower() not in ['n/a', '']:
+                        calling_data['home_unit'] = home_unit_name.strip()
+                    
                     # Handle called_by if available
-                    called_by_name = row[11]  # To Be Called By
+                    called_by_name = row[12]  # To Be Called By
                     if called_by_name and called_by_name.lower() not in ['n/a', '']:
-                        called_by, _ = Member.objects.get_or_create(
-                            name=called_by_name,
-                            defaults={'home_unit': unit}
-                        )
-                        calling_data['called_by'] = called_by
+                        calling_data['called_by'] = called_by_name.strip()
                     
                     # Handle bishop_consulted_by if available
                     bishop_consulted = row[9]  # Bishop To Be Consulted By
                     if bishop_consulted and bishop_consulted.lower() not in ['n/a', '']:
-                        bishop, _ = Member.objects.get_or_create(
-                            name=bishop_consulted,
-                            defaults={'home_unit': unit}
-                        )
-                        calling_data['bishop_consulted_by'] = bishop
+                        calling_data['bishop_consulted_by'] = bishop_consulted.strip()
+                    
+                    # Build notes from various fields
+                    notes_parts = ["Imported from completed callings."]
+                    if calling_data.get('released_by'):
+                        notes_parts.append(f"Released by: {calling_data['released_by']}")
+                    if calling_data.get('proposed_replacement'):
+                        notes_parts.append(f"Proposed replacement: {calling_data['proposed_replacement']}")
+                    if calling_data.get('home_unit'):
+                        notes_parts.append(f"Home unit: {calling_data['home_unit']}")
+                    calling_data['notes'] = " ".join(notes_parts)
                     
                     # Create or update the calling
                     calling, created = Calling.objects.update_or_create(
-                        member=member,
+                        name=member_name,
                         position=position,
+                        organization=org,
                         unit=unit,
                         defaults=calling_data
                     )
@@ -197,6 +215,5 @@ class Command(BaseCommand):
         self.stdout.write(f"Units created: {stats['units_created']}")
         self.stdout.write(f"Organizations created: {stats['organizations_created']}")
         self.stdout.write(f"Positions created: {stats['positions_created']}")
-        self.stdout.write(f"Members created: {stats['members_created']}")
         self.stdout.write(f"Callings created: {stats['callings_created']}")
         self.stdout.write(f"Callings updated: {stats['callings_updated']}")
