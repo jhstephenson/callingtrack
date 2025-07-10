@@ -35,5 +35,6 @@ urlpatterns = [
     path('callings/<int:pk>/update/', views.CallingUpdateView.as_view(), name='calling-update'),
     path('callings/<int:pk>/delete/', views.CallingDeleteView.as_view(), name='calling-delete'),
     path('callings/<int:pk>/release/', views.CallingReleaseView.as_view(), name='calling-release'),
+    path('callings/<int:pk>/lcr-update/', views.CallingLCRUpdateView.as_view(), name='calling-lcr-update'),
     path('callings/<int:pk>/update-status/<str:new_status>/', views.CallingUpdateStatusView.as_view(), name='calling-update-status'),
 ]

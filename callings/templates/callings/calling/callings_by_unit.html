@@ -114,6 +114,12 @@
                                        data-bs-toggle="tooltip" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    {% if calling.status != 'LCR_UPDATED' %}
+                                    <a href="{% url 'callings:calling-lcr-update' calling.pk %}" class="btn btn-sm btn-outline-info"
+                                       data-bs-toggle="tooltip" title="Mark as LCR Updated">
+                                        <i class="fas fa-sync"></i>
+                                    </a>
+                                    {% endif %}
                                     <a href="{% url 'callings:calling-update' calling.pk %}" class="btn btn-sm btn-outline-secondary"
                                        data-bs-toggle="tooltip" title="Edit">
                                         <i class="fas fa-edit"></i>

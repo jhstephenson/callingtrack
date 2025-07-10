@@ -592,3 +592,29 @@ class CallingReleaseView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin,
     def get_success_url(self):
         return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
 
+class CallingLCRUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
+    model = Calling
+    fields = []  # No form fields needed, just updating status
+    
+    def get_title(self):
+        return f"Update LCR Status: {self.get_object().position.title}"
+    
+    def post(self, request, *args, **kwargs):
+        calling = self.get_object()
+        
+        # Update the status to LCR_UPDATED
+        calling.status = 'LCR_UPDATED'
+        calling.lcr_updated = True
+        calling.save()
+        
+        messages.success(request, f'LCR status updated for {calling.position.title} calling.')
+        
+        # Redirect back to the referring page or calling list
+        next_url = request.POST.get('next', request.META.get('HTTP_REFERER', reverse_lazy('callings:calling-list')))
+        return redirect(next_url)
+    
+    def get(self, request, *args, **kwargs):
+        # For GET requests, just redirect to calling detail
+        calling = self.get_object()
+        return redirect('callings:calling-detail', pk=calling.pk)
+
