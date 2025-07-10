@@ -27,7 +27,12 @@ class Unit(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_unit_type_display()})"
+        unit_type_display = self.get_unit_type_display()
+        # If the unit type is already mentioned in the name, don't repeat it
+        if unit_type_display.lower() in self.name.lower():
+            return self.name
+        else:
+            return f"{self.name} ({unit_type_display})"
     
     def get_list_display(self):
         return [
@@ -111,6 +116,8 @@ class Position(models.Model):
 
 class Calling(models.Model):
     STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
         ('IN_PROGRESS', 'In Progress'),
         ('COMPLETED', 'Completed'),
         ('CANCELLED', 'Cancelled'),
@@ -135,10 +142,10 @@ class Calling(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='callings')
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name='callings')
     position = models.ForeignKey(Position, on_delete=models.PROTECT, related_name='callings')
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, blank=True, null=True)
     
     # Status fields
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='IN_PROGRESS')
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='PENDING')
     calling_status = models.CharField(max_length=10, choices=CALLING_STATUS_CHOICES, default='ACTIVE')
     is_active = models.BooleanField(default=True, help_text="Whether this calling is currently active")
     
@@ -193,10 +200,12 @@ class Calling(models.Model):
         null=True,
         help_text="Name of the proposed replacement for this calling"
     )
-    home_unit = models.CharField(
-        max_length=200, 
+    home_unit = models.ForeignKey(
+        Unit,
+        on_delete=models.SET_NULL,
         blank=True, 
         null=True,
+        related_name='home_members',
         help_text="Home unit of the person (may differ from calling unit)"
     )
     presidency_approved = models.DateField(
@@ -254,6 +263,12 @@ class Calling(models.Model):
     def get_absolute_url(self):
         return reverse('callings:calling-detail', kwargs={'pk': self.pk})
     
+    def save(self, *args, **kwargs):
+        # Automatically update status to APPROVED when presidency_approved has a date
+        if self.presidency_approved and self.status == 'PENDING':
+            self.status = 'APPROVED'
+        super().save(*args, **kwargs)
+    
     def get_approval_status_class(self, approval_type):
         """Return CSS class for approval status badges"""
         status_map = {
@@ -277,6 +292,8 @@ class Calling(models.Model):
     def get_status_badge_class(self):
         """Return CSS class for status badges"""
         status_map = {
+            'PENDING': 'warning',
+            'APPROVED': 'success',
             'IN_PROGRESS': 'primary',
             'COMPLETED': 'success',
             'CANCELLED': 'danger',

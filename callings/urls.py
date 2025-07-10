@@ -29,6 +29,7 @@ urlpatterns = [
     
     # Calling URLs
     path('callings/', views.CallingListView.as_view(), name='calling-list'),
+    path('callings/by-unit/', views.CallingsByUnitView.as_view(), name='callings-by-unit'),
     path('callings/<int:pk>/', views.CallingDetailView.as_view(), name='calling-detail'),
     path('callings/create/', views.CallingCreateView.as_view(), name='calling-create'),
     path('callings/<int:pk>/update/', views.CallingUpdateView.as_view(), name='calling-update'),

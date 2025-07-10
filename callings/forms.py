@@ -59,15 +59,18 @@ class CallingForm(ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['name'].required = True
+        # Only these fields are required
         self.fields['unit'].required = True
         self.fields['organization'].required = True
         self.fields['position'].required = True
-        self.fields['date_called'].required = True
+        
+        # These fields are not required initially
+        self.fields['name'].required = False
+        self.fields['date_called'].required = False
         
         # Set initial status if creating a new calling
         if not self.instance.pk:
-            self.fields['status'].initial = 'IN_PROGRESS'
+            self.fields['status'].initial = 'PENDING'
             
     def clean(self):
         cleaned_data = super().clean()
