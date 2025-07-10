@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Count, Q
 from django.utils import timezone
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, TemplateView
+    ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, TemplateView, View
 )
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -38,6 +38,30 @@ class TitleMixin:
         context = super().get_context_data(**kwargs)
         context['title'] = self.get_title()
         return context
+
+# Mixin to add sortable functionality to list views
+class SortableMixin:
+    sortable_fields = {}
+    default_sort = None
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Apply sorting
+        sort_field = self.request.GET.get('sort')
+        sort_order = self.request.GET.get('order', 'asc')
+        
+        if sort_field and sort_field in self.sortable_fields:
+            order_field = self.sortable_fields[sort_field]
+            if sort_order == 'desc':
+                order_field = f'-{order_field}'
+            return queryset.order_by(order_field)
+        
+        # Apply default sort if specified
+        if self.default_sort:
+            return queryset.order_by(self.default_sort)
+            
+        return queryset
 
 # Dashboard View
 @login_required
@@ -109,16 +133,32 @@ def dashboard(request):
     return render(request, 'callings/dashboard.html', context)
 
 # Unit Views
-class UnitListView(LoginRequiredMixin, TitleMixin, ListView):
+class UnitListView(LoginRequiredMixin, TitleMixin, SortableMixin, ListView):
     model = Unit
     template_name = 'callings/unit/unit_list.html'
     context_object_name = 'units'
     title = 'Units'
     paginate_by = 20
+    default_sort = 'sort_order'
+    sortable_fields = {
+        'name': 'name',
+        'unit_type': 'unit_type', 
+        'parent_unit': 'parent_unit__name',
+        'meeting_time': 'meeting_time',
+        'is_active': 'is_active',
+        'sort_order': 'sort_order',
+    }
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['headers'] = ['Name', 'Type', 'Parent Unit', 'Meeting Time', 'Status']
+        context['sortable_headers'] = [
+            ('name', 'Name'),
+            ('unit_type', 'Type'),
+            ('parent_unit', 'Parent Unit'),
+            ('meeting_time', 'Meeting Time'),
+            ('is_active', 'Status'),
+        ]
         return context
 
 class UnitDetailView(LoginRequiredMixin, TitleMixin, DetailView):
@@ -295,6 +335,32 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
             # Default: show all callings
             pass
         
+        # Apply sorting
+        sort_field = self.request.GET.get('sort')
+        sort_order = self.request.GET.get('order', 'asc')
+        
+        if sort_field:
+            # Map frontend field names to model fields
+            sort_mapping = {
+                'unit': 'unit__name',
+                'organization': 'organization__name', 
+                'position': 'position__title',
+                'name': 'name',
+                'proposed_replacement': 'proposed_replacement',
+                'status': 'status',
+                'created_at': 'created_at',
+                'date_called': 'date_called',
+                'date_sustained': 'date_sustained',
+                'date_set_apart': 'date_set_apart',
+            }
+            
+            if sort_field in sort_mapping:
+                order_field = sort_mapping[sort_field]
+                if sort_order == 'desc':
+                    order_field = f'-{order_field}'
+                return queryset.order_by(order_field)
+        
+        # Default ordering
         return queryset.order_by('unit__sort_order', 'unit__name', 'organization__name', 'position__title')
     
     def get_context_data(self, **kwargs):
@@ -375,6 +441,31 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
             # Default: show all callings
             pass
         
+        # Apply sorting
+        sort_field = self.request.GET.get('sort')
+        sort_order = self.request.GET.get('order', 'asc')
+        
+        if sort_field:
+            # Map frontend field names to model fields
+            sort_mapping = {
+                'organization': 'organization__name', 
+                'position': 'position__title',
+                'name': 'name',
+                'proposed_replacement': 'proposed_replacement',
+                'status': 'status',
+                'created_at': 'created_at',
+                'date_called': 'date_called',
+                'date_sustained': 'date_sustained',
+                'date_set_apart': 'date_set_apart',
+            }
+            
+            if sort_field in sort_mapping:
+                order_field = sort_mapping[sort_field]
+                if sort_order == 'desc':
+                    order_field = f'-{order_field}'
+                return queryset.order_by('unit__sort_order', 'unit__name', order_field)
+        
+        # Default ordering
         return queryset.order_by('unit__sort_order', 'unit__name', 'organization__name', 'position__title')
     
     def get_context_data(self, **kwargs):
@@ -458,6 +549,31 @@ class CallingDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
     
     def get_title(self):
         return f"Delete Calling: {self.get_object().position.title}"
+
+class CallingUpdateStatusView(LoginRequiredMixin, SuperuserRequiredMixin, View):
+    def get(self, request, pk, new_status):
+        return self.update_status(request, pk, new_status)
+    
+    def post(self, request, pk, new_status):
+        return self.update_status(request, pk, new_status)
+    
+    def update_status(self, request, pk, new_status):
+        # Ensure the new status is valid
+        valid_statuses = [choice[0] for choice in Calling.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            messages.error(request, 'Invalid status update.')
+            return redirect('callings:calling-list')
+        
+        calling = get_object_or_404(Calling, pk=pk)
+        old_status = calling.get_status_display()
+        calling.status = new_status
+        calling.save()
+        
+        new_status_display = calling.get_status_display()
+        messages.success(request, f'Calling status updated from {old_status} to {new_status_display} successfully.')
+        
+        # Redirect back to the calling list or detail page based on where the request came from
+        return redirect(request.META.get('HTTP_REFERER', 'callings:calling-list'))
 
 class CallingReleaseView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Calling

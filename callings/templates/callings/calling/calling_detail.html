@@ -398,6 +398,12 @@
                         </a>
                         {% endif %}
                         
+                        {% if object.status != 'LCR_UPDATED' %}
+                        <a href="{% url 'callings:calling-update-status' object.pk 'LCR_UPDATED' %}" class="btn btn-info">
+                            <i class="fas fa-sync"></i> Mark as LCR Updated
+                        </a>
+                        {% endif %}
+                        
                         {% if object.status != 'RELEASED' %}
                         <a href="{% url 'callings:calling-release' object.pk %}" class="btn btn-warning">
                             <i class="fas fa-sign-out-alt"></i> Release from Calling

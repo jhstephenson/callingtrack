@@ -1,4 +1,5 @@
 {% extends 'callings/base.html' %}
+{% load table_tags %}
 
 {% block content %}
 <div class="container">
@@ -40,9 +41,15 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            {% for header in headers %}
-                            <th>{{ header }}</th>
-                            {% endfor %}
+                            {% if sortable_headers %}
+                                {% for field, label in sortable_headers %}
+                                <th>{% sort_header field label %}</th>
+                                {% endfor %}
+                            {% else %}
+                                {% for header in headers %}
+                                <th>{{ header }}</th>
+                                {% endfor %}
+                            {% endif %}
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
