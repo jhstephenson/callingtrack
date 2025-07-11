@@ -174,7 +174,9 @@ class UnitCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, Cre
     form_class = UnitForm
     template_name = 'callings/unit/unit_form.html'
     title = 'Create Unit'
-    success_url = reverse_lazy('callings:unit-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('callings:unit-detail', kwargs={'pk': self.object.pk})
 
 class UnitUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Unit
@@ -185,7 +187,7 @@ class UnitUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, Upd
         return f"Update Unit: {self.get_object().name}"
     
     def get_success_url(self):
-        return reverse_lazy('callings:unit-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('callings:unit-list')
 
 class UnitDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, DeleteView):
     model = Unit
@@ -221,7 +223,9 @@ class OrganizationCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMi
     form_class = OrganizationForm
     template_name = 'callings/organization/organization_form.html'
     title = 'Create Organization'
-    success_url = reverse_lazy('callings:organization-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('callings:organization-detail', kwargs={'pk': self.object.pk})
 
 class OrganizationUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Organization
@@ -232,7 +236,7 @@ class OrganizationUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMi
         return f"Update Organization: {self.get_object().name}"
     
     def get_success_url(self):
-        return reverse_lazy('callings:organization-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('callings:organization-list')
 
 class OrganizationDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, DeleteView):
     model = Organization
@@ -268,7 +272,9 @@ class PositionCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin,
     form_class = PositionForm
     template_name = 'callings/position/position_form.html'
     title = 'Create Position'
-    success_url = reverse_lazy('callings:position-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('callings:position-detail', kwargs={'pk': self.object.pk})
 
 class PositionUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Position
@@ -279,7 +285,7 @@ class PositionUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin,
         return f"Update Position: {self.get_object().title}"
     
     def get_success_url(self):
-        return reverse_lazy('callings:position-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('callings:position-list')
 
 class PositionDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, DeleteView):
     model = Position
@@ -529,7 +535,9 @@ class CallingCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
     form_class = CallingForm
     template_name = 'callings/calling/calling_form.html'
     title = 'Create Calling'
-    success_url = reverse_lazy('callings:calling-list')
+    
+    def get_success_url(self):
+        return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
 
 class CallingUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Calling
@@ -540,7 +548,7 @@ class CallingUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
         return f"Update Calling: {self.get_object().position.title}"
     
     def get_success_url(self):
-        return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('callings:calling-list')
 
 class CallingDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, DeleteView):
     model = Calling

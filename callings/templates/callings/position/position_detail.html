@@ -7,6 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ object.title }} <small class="text-muted">Position</small></h1>
         <div class="btn-group" role="group">
+            <a href="{% url 'callings:position-list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> Return to List
+            </a>
             <a href="{% url 'callings:position-update' object.pk %}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit"></i> Edit
             </a>

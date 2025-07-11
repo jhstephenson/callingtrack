@@ -270,6 +270,9 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'callings:calling-list' %}" class="btn btn-outline-primary me-md-2">
+                                <i class="fas fa-list"></i> Return to List
+                            </a>
                             <a href="{% if form.instance.pk %}{% url 'callings:calling-detail' form.instance.pk %}{% else %}{% url 'callings:calling-list' %}{% endif %}" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-times"></i> Cancel

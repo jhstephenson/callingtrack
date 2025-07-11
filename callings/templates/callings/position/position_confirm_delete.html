@@ -63,7 +63,7 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'position-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
+                            <a href="{% url 'callings:position-detail' object.pk %}" class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-arrow-left"></i> Back to Position
                             </a>
                             <button type="submit" class="btn btn-danger">
@@ -78,19 +78,3 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Confirm before submitting the form
-    var form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            var confirmed = confirm('Are you absolutely sure you want to delete this position and all associated callings? This action cannot be undone.');
-            if (!confirmed) {
-                e.preventDefault();
-            }
-        });
-    }
-});
-</script>
-{% endblock %}

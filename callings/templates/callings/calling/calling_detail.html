@@ -14,7 +14,10 @@
             </p>
         </div>
         <div class="btn-group" role="group">
-            <a href="{% url 'callings:calling-update' object.pk %}" class="btn btn-outline-primary">
+            <a href="{% url 'callings:calling-list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> Return to List
+            </a>
+            <a href="{% url 'callings:calling-update' object.pk %}" class="btn btn-outline-secondary">
                 <i class="fas fa-edit"></i> Edit
             </a>
             <a href="{% url 'callings:calling-delete' object.pk %}" class="btn btn-outline-danger">
