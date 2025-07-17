@@ -122,10 +122,10 @@ class Calling(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('APPROVED', 'Approved'),
-        ('IN_PROGRESS', 'In Progress'),
         ('COMPLETED', 'Completed'),
         ('CANCELLED', 'Cancelled'),
         ('ON_HOLD', 'On Hold'),
+        ('CALLED', 'Called'),
         ('LCR_UPDATED', 'LCR Updated'),
     ]
     
@@ -133,6 +133,7 @@ class Calling(models.Model):
         ('ACTIVE', 'Active'),
         ('RELEASED', 'Released'),
         ('PENDING', 'Pending Approval'),
+        ('CALLED', 'Called'),
     ]
     
     APPROVAL_STATUS_CHOICES = [
