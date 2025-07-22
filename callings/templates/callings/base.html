@@ -31,11 +31,10 @@
                             <i class="fas fa-phone-alt"></i> Callings
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'callings:calling-list' %}">All Callings</a></li>
+                            <li><a class="dropdown-item" href="{% url 'callings:callings-by-unit' %}">All Callings</a></li>
                             <li><a class="dropdown-item" href="{% url 'callings:calling-create' %}">Add New</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'callings:calling-list' %}?status=active">Active</a></li>
-                            <li><a class="dropdown-item" href="{% url 'callings:calling-list' %}?status=completed">Completed</a></li>
+                            <li><a class="dropdown-item" href="{% url 'callings:callings-by-unit' %}?status=active">Active</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

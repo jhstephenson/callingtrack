@@ -14,7 +14,7 @@
             </p>
         </div>
         <div class="btn-group" role="group">
-            <a href="{% url 'callings:calling-list' %}" class="btn btn-outline-primary">
+            <a href="{% if back_url %}{{ back_url }}{% else %}{% url 'callings:callings-by-unit' %}{% endif %}" class="btn btn-outline-primary">
                 <i class="fas fa-list"></i> Return to List
             </a>
             <a href="{% url 'callings:calling-update' object.pk %}" class="btn btn-outline-secondary">

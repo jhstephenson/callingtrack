@@ -272,6 +272,7 @@ class Calling(models.Model):
         # Automatically update status to APPROVED when presidency_approved has a date
         if self.presidency_approved and self.status == 'PENDING':
             self.status = 'APPROVED'
+            
         super().save(*args, **kwargs)
     
     def get_approval_status_class(self, approval_type):

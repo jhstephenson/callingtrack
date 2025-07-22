@@ -48,21 +48,9 @@
             
             <!-- Status Filter Buttons -->
             <div class="btn-group flex-wrap" role="group" aria-label="Status filters">
-                <a href="?status=pending{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
-                    <i class="fas fa-hourglass-half"></i> Pending ({{ pending_count }})
-                </a>
-                <a href="?status=approved{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
-                    <i class="fas fa-check"></i> Approved ({{ approved_count }})
-                </a>
-                <a href="?status=completed{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">
-                    <i class="fas fa-check-circle"></i> Completed ({{ completed_count }})
-                </a>
-                <a href="?status=lcr_updated{% if current_search %}&search={{ current_search }}{% endif %}" 
-                   class="btn {% if current_status == 'lcr_updated' %}btn-info{% else %}btn-outline-info{% endif %}">
-                    <i class="fas fa-sync"></i> LCR Updated ({{ lcr_updated_count }})
+                <a href="?status=active{% if current_search %}&search={{ current_search }}{% endif %}" 
+                   class="btn {% if current_status == 'active' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    <i class="fas fa-user-check"></i> Active ({{ active_count }})
                 </a>
                 <a href="?status=all{% if current_search %}&search={{ current_search }}{% endif %}" 
                    class="btn {% if current_status == 'all' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
@@ -109,8 +97,8 @@
                             </td>
                             <td>{{ calling.created_at|date:"M d, Y" }}</td>
                             <td class="text-end">
-                                <div class="btn-group" role="group">
-                                    <a href="{{ calling.get_absolute_url }}" class="btn btn-sm btn-outline-primary" 
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ calling.get_absolute_url }}" class="text-primary" 
                                        data-bs-toggle="tooltip" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
@@ -118,17 +106,17 @@
                                     <form method="post" action="{% url 'callings:calling-lcr-update' calling.pk %}" class="d-inline">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-info"
+                                        <button type="submit" class="btn p-0 border-0 text-info"
                                                 data-bs-toggle="tooltip" title="Mark as LCR Updated">
                                             <i class="fas fa-sync"></i>
                                         </button>
                                     </form>
                                     {% endif %}
-                                    <a href="{% url 'callings:calling-update' calling.pk %}" class="btn btn-sm btn-outline-secondary"
+                                    <a href="{% url 'callings:calling-update' calling.pk %}" class="text-secondary"
                                        data-bs-toggle="tooltip" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'callings:calling-delete' calling.pk %}" class="btn btn-sm btn-outline-danger"
+                                    <a href="{% url 'callings:calling-delete' calling.pk %}" class="text-danger"
                                        data-bs-toggle="tooltip" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>

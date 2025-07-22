@@ -85,7 +85,8 @@ def dashboard(request):
     # Get counts for dashboard cards
     context['total_units'] = Unit.objects.count()
     context['total_callings'] = Calling.objects.filter(is_active=True).count()
-    context['active_callings'] = Calling.objects.filter(calling_status='ACTIVE').count()
+    # Use new Active definition: not COMPLETED, LCR_UPDATED, or CANCELLED
+    context['active_callings'] = Calling.objects.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED']).count()
     context['recent_callings'] = recent_callings.order_by('-created_at')[:10]
     
     # Get upcoming events (next 30 days)
@@ -333,7 +334,8 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
         elif status_filter == 'on_hold':
             queryset = queryset.filter(status='ON_HOLD')
         elif status_filter == 'active':
-            queryset = queryset.filter(calling_status='ACTIVE')
+            # Active calling is any calling not marked as COMPLETED, LCR_UPDATED, or CANCELLED
+            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED'])
         elif status_filter == 'all':
             # Show all callings
             pass
@@ -393,7 +395,8 @@ class CallingListView(LoginRequiredMixin, TitleMixin, ListView):
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
         context['on_hold_count'] = all_callings.filter(status='ON_HOLD').count()
-        context['active_count'] = all_callings.filter(calling_status='ACTIVE').count()
+        # Use new Active definition: not COMPLETED, LCR_UPDATED, or CANCELLED
+        context['active_count'] = all_callings.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED']).count()
         context['all_count'] = all_callings.count()
         
         # Current filter for template
@@ -440,7 +443,8 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
         elif status_filter == 'on_hold':
             queryset = queryset.filter(status='ON_HOLD')
         elif status_filter == 'active':
-            queryset = queryset.filter(calling_status='ACTIVE')
+            # Active calling is any calling not marked as COMPLETED, LCR_UPDATED, or CANCELLED
+            queryset = queryset.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED'])
         elif status_filter == 'all':
             pass
         else:
@@ -509,7 +513,8 @@ class CallingsByUnitView(LoginRequiredMixin, TitleMixin, ListView):
         context['lcr_updated_count'] = all_callings.filter(status='LCR_UPDATED').count()
         context['cancelled_count'] = all_callings.filter(status='CANCELLED').count()
         context['on_hold_count'] = all_callings.filter(status='ON_HOLD').count()
-        context['active_count'] = all_callings.filter(calling_status='ACTIVE').count()
+        # Use new Active definition: not COMPLETED, LCR_UPDATED, or CANCELLED
+        context['active_count'] = all_callings.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED']).count()
         context['all_count'] = all_callings.count()
         
         context['current_status'] = self.request.GET.get('status', 'all')
@@ -528,7 +533,48 @@ class CallingDetailView(LoginRequiredMixin, TitleMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['release_form'] = CallingReleaseForm(instance=self.object)
+        
+        # Preserve filter context from referring page
+        context['back_url'] = self.get_back_url()
+        
         return context
+    
+    def get_back_url(self):
+        """Generate the URL to go back to the filtered list view"""
+        # Check if we came from a specific filter
+        referer = self.request.META.get('HTTP_REFERER', '')
+        
+        # Extract filter parameters from the referer URL
+        from django.urls import reverse
+        from urllib.parse import quote
+        
+        base_url = reverse('callings:callings-by-unit')
+        
+        if 'status=' in referer:
+            import re
+            status_match = re.search(r'status=([^&]+)', referer)
+            if status_match:
+                status = status_match.group(1)
+                
+                # Check if there's also a search parameter
+                if 'search=' in referer:
+                    search_match = re.search(r'search=([^&]+)', referer)
+                    if search_match:
+                        search_term = quote(search_match.group(1))
+                        return f"{base_url}?status={status}&search={search_term}"
+                
+                return f"{base_url}?status={status}"
+        
+        # Check if it includes search parameter alone
+        if 'search=' in referer:
+            import re
+            search_match = re.search(r'search=([^&]+)', referer)
+            if search_match:
+                search_term = quote(search_match.group(1))
+                return f"{base_url}?search={search_term}"
+        
+        # Default back to all callings (grouped view)
+        return base_url
 
 class CallingCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, CreateView):
     model = Calling
@@ -537,7 +583,27 @@ class CallingCreateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
     title = 'Create Calling'
     
     def get_success_url(self):
+        # Preserve filter parameters from GET if present
+        referer = self.request.META.get('HTTP_REFERER')
+        if referer:
+            from urllib.parse import urlparse, parse_qs, urlencode
+            parsed_url = urlparse(referer)
+            query_params = parse_qs(parsed_url.query)
+            
+            # Check if referer came from a filtered view
+            if 'callings/by-unit' in referer or 'callings/callings' in referer:
+                base_url = reverse_lazy('callings:callings-by-unit')
+                
+                # Reconstruct the URL with current GET params
+                if query_params:
+                    query_string = urlencode({k: v[0] for k, v in query_params.items()})
+                    return f'{base_url}?{query_string}'
+                return base_url
+        
+        # Default to calling detail page
         return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
+        
+
 
 class CallingUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
     model = Calling
@@ -547,8 +613,44 @@ class CallingUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
     def get_title(self):
         return f"Update Calling: {self.get_object().position.title}"
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the referer information to the template
+        referer = self.request.META.get('HTTP_REFERER', '')
+        context['return_url'] = self.get_return_url(referer)
+        return context
+    
+    def get_return_url(self, referer):
+        """Determine the return URL based on the referer"""
+        if 'status=active' in referer and 'callings/by-unit' in referer:
+            return reverse_lazy('callings:callings-by-unit') + '?status=active'
+        elif 'callings/by-unit' in referer:
+            # Extract query parameters from referer
+            from urllib.parse import urlparse, parse_qs, urlencode
+            parsed_url = urlparse(referer)
+            query_params = parse_qs(parsed_url.query)
+            if query_params:
+                query_string = urlencode({k: v[0] for k, v in query_params.items()})
+                return reverse_lazy('callings:callings-by-unit') + f'?{query_string}'
+            return reverse_lazy('callings:callings-by-unit')
+        elif 'callings/calling' in referer:
+            # Extract query parameters from referer for list view
+            from urllib.parse import urlparse, parse_qs, urlencode
+            parsed_url = urlparse(referer)
+            query_params = parse_qs(parsed_url.query)
+            if query_params:
+                query_string = urlencode({k: v[0] for k, v in query_params.items()})
+                return reverse_lazy('callings:calling-list') + f'?{query_string}'
+            return reverse_lazy('callings:calling-list')
+        return None
+    
     def get_success_url(self):
-        return reverse_lazy('callings:calling-list')
+        # Check if a return URL was provided in the POST data
+        return_url = self.request.POST.get('return_url')
+        if return_url:
+            return return_url
+        # Fallback to calling detail page
+        return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
 
 class CallingDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, DeleteView):
     model = Calling
@@ -598,6 +700,24 @@ class CallingReleaseView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin,
         return super().form_valid(form)
     
     def get_success_url(self):
+        # Preserve filter parameters from GET if present
+        referer = self.request.META.get('HTTP_REFERER')
+        if referer:
+            from urllib.parse import urlparse, parse_qs, urlencode
+            parsed_url = urlparse(referer)
+            query_params = parse_qs(parsed_url.query)
+            
+            # Check if referer came from a filtered view
+            if 'callings/by-unit' in referer or 'callings/callings' in referer:
+                base_url = reverse_lazy('callings:callings-by-unit')
+                
+                # Reconstruct the URL with current GET params
+                if query_params:
+                    query_string = urlencode({k: v[0] for k, v in query_params.items()})
+                    return f'{base_url}?{query_string}'
+                return base_url
+        
+        # Default to calling detail page
         return reverse_lazy('callings:calling-detail', kwargs={'pk': self.object.pk})
 
 class CallingLCRUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, UpdateView):
@@ -618,7 +738,20 @@ class CallingLCRUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixi
         messages.success(request, f'LCR status updated for {calling.position.title} calling.')
         
         # Redirect back to the referring page or calling list
-        next_url = request.POST.get('next', request.META.get('HTTP_REFERER', reverse_lazy('callings:calling-list')))
+        referer = request.META.get('HTTP_REFERER')
+        if referer and ('callings/by-unit' in referer or 'callings/callings' in referer):
+            # If we came from a filtered view, preserve that context
+            from urllib.parse import urlparse, parse_qs, urlencode
+            parsed_url = urlparse(referer)
+            query_params = parse_qs(parsed_url.query)
+            base_url = reverse_lazy('callings:callings-by-unit')
+            
+            if query_params:
+                query_string = urlencode({k: v[0] for k, v in query_params.items()})
+                return redirect(f'{base_url}?{query_string}')
+            return redirect(base_url)
+        
+        next_url = request.POST.get('next', referer or reverse_lazy('callings:calling-list'))
         return redirect(next_url)
     
     def get(self, request, *args, **kwargs):
