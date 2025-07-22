@@ -12,26 +12,7 @@
 
 <!-- Stats Cards -->
 <div class="row g-4 mb-4">
-    <div class="col-md-6 col-lg-3">
-        <a href="{% url 'callings:unit-list' %}" class="text-decoration-none">
-            <div class="card stat-card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase text-muted mb-0">Total Units</h6>
-                            <h2 class="mb-0">{{ total_units|intcomma }}</h2>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded">
-                            <i class="fas fa-church fa-2x text-primary"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    
-    
-    <div class="col-md-6 col-lg-3">
+    <div class="col-md-6">
         <a href="{% url 'callings:calling-list' %}" class="text-decoration-none">
             <div class="card stat-card h-100">
                 <div class="card-body">
@@ -49,7 +30,7 @@
         </a>
     </div>
     
-    <div class="col-md-6 col-lg-3">
+    <div class="col-md-6">
         <a href="{% url 'callings:calling-list' %}?status=active" class="text-decoration-none">
             <div class="card stat-card h-100">
                 <div class="card-body">
@@ -190,11 +171,14 @@ document.addEventListener('DOMContentLoaded', function() {
         labels: {{ calling_status_data|safe|default:'[]' }}.map(item => {
             // Convert status code to readable format
             const statusMap = {
-                'ACTIVE': 'Active',
-                'RELEASED': 'Released',
-                'PENDING': 'Pending'
+                'PENDING': 'Pending',
+                'APPROVED': 'Approved', 
+                'COMPLETED': 'Completed',
+                'LCR_UPDATED': 'LCR Updated',
+                'CANCELLED': 'Cancelled',
+                'ON_HOLD': 'On Hold'
             };
-            return statusMap[item.calling_status] || item.calling_status;
+            return statusMap[item.status] || item.status;
         }),
         datasets: [{
             data: {{ calling_status_data|safe|default:'[]' }}.map(item => item.count),
