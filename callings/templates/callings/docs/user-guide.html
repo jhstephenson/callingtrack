@@ -1,0 +1,301 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}User Guide - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Table of Contents -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Table of Contents</h5>
+                </div>
+                <div class="card-body p-0">
+                    <nav class="nav nav-pills flex-column p-2">
+                        <a class="nav-link text-dark" href="#getting-started">Getting Started</a>
+                        <a class="nav-link text-dark" href="#dashboard">Dashboard Overview</a>
+                        <a class="nav-link text-dark" href="#managing-callings">Managing Callings</a>
+                        <a class="nav-link text-dark" href="#navigation">Navigation</a>
+                        <a class="nav-link text-dark" href="#status-badges">Status Badges</a>
+                        <a class="nav-link text-dark" href="#workflows">Workflows</a>
+                        <a class="nav-link text-dark" href="#troubleshooting">Troubleshooting</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h1><i class="fas fa-book"></i> CallingTrack User Guide</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Getting Started -->
+                    <section id="getting-started" class="mb-5">
+                        <h2>Getting Started</h2>
+                        <p class="lead">Welcome to CallingTrack! This guide will help you navigate and use the system effectively.</p>
+                        
+                        <h3>Accessing the System</h3>
+                        <ol>
+                            <li>Open your web browser and navigate to your CallingTrack URL</li>
+                            <li>Log in with your username and password</li>
+                            <li>You'll be taken to the Dashboard showing active callings</li>
+                        </ol>
+                        
+                        <h3>User Roles</h3>
+                        <ul>
+                            <li><strong>Regular Users:</strong> Can view callings and access documentation</li>
+                            <li><strong>Administrators:</strong> Can create, edit, and manage all callings and master data</li>
+                        </ul>
+                    </section>
+
+                    <!-- Dashboard Overview -->
+                    <section id="dashboard" class="mb-5">
+                        <h2>Dashboard Overview</h2>
+                        <p>The dashboard is your main hub for viewing calling information and system statistics.</p>
+                        
+                        <h3>Dashboard Components</h3>
+                        <ul>
+                            <li><strong>Statistics Cards:</strong> Show total units, callings, and active callings count</li>
+                            <li><strong>Active Callings Table:</strong> Displays the 15 most recent active callings</li>
+                            <li><strong>Status Chart:</strong> Visual breakdown of callings by status</li>
+                            <li><strong>Quick Actions:</strong> Easy access to common tasks</li>
+                        </ul>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Tip:</strong> Active callings are those that are not yet completed, LCR updated, or cancelled.
+                        </div>
+                    </section>
+
+                    <!-- Managing Callings -->
+                    <section id="managing-callings" class="mb-5">
+                        <h2>Managing Callings</h2>
+                        
+                        <h3>Viewing Callings</h3>
+                        <p>There are two main ways to view callings:</p>
+                        <ul>
+                            <li><strong>All Callings:</strong> A paginated list view of all callings</li>
+                            <li><strong>By Unit:</strong> Callings grouped by organizational unit (recommended)</li>
+                        </ul>
+                        
+                        <h3>Filtering and Searching</h3>
+                        <p>You can filter callings by status:</p>
+                        <ul>
+                            <li><span class="badge bg-info">Pending</span> - Awaiting approval</li>
+                            <li><span class="badge bg-success">Approved</span> - Approved but not sustained</li>
+                            <li><span class="badge bg-success">Completed</span> - Sustained and active</li>
+                            <li><span class="badge bg-secondary">LCR Updated</span> - Updated in church records</li>
+                            <li><span class="badge bg-warning">On Hold</span> - Temporarily paused</li>
+                            <li><span class="badge bg-danger">Cancelled</span> - No longer proceeding</li>
+                        </ul>
+                        
+                        <h3>Creating New Callings (Admin Only)</h3>
+                        <ol>
+                            <li>Navigate to Callings → Add New</li>
+                            <li>Select the Unit, Organization, and Position</li>
+                            <li>Enter the person's name if known</li>
+                            <li>Add any proposed replacement if applicable</li>
+                            <li>Set the appropriate status</li>
+                            <li>Add relevant dates and notes</li>
+                            <li>Click Save</li>
+                        </ol>
+                        
+                        <h3>Editing Callings (Admin Only)</h3>
+                        <ul>
+                            <li>Click on any calling to view its details</li>
+                            <li>Use the "Edit" button to modify calling information</li>
+                            <li>Status can be updated directly from list views</li>
+                            <li>Use "Return to List" to go back to your filtered view</li>
+                        </ul>
+                    </section>
+
+                    <!-- Navigation -->
+                    <section id="navigation" class="mb-5">
+                        <h2>Navigation</h2>
+                        
+                        <h3>Main Navigation Menu</h3>
+                        <ul>
+                            <li><strong>Dashboard:</strong> Home page with overview and active callings</li>
+                            <li><strong>Callings Menu:</strong>
+                                <ul>
+                                    <li>All Callings - Complete list view</li>
+                                    <li>Add New - Create a new calling (admin only)</li>
+                                    <li>Active - Show only active callings</li>
+                                </ul>
+                            </li>
+                            <li><strong>Master Files Menu:</strong> Manage Units, Organizations, and Positions (admin only)</li>
+                            <li><strong>Admin:</strong> Access Django admin interface (superusers only)</li>
+                        </ul>
+                        
+                        <h3>User Menu</h3>
+                        <p>Click on your name in the top-right corner to access:</p>
+                        <ul>
+                            <li>Change Password</li>
+                            <li>Documentation (User Guide, Admin Guide, Technical Docs)</li>
+                            <li>Logout</li>
+                        </ul>
+                        
+                        <h3>Breadcrumb Navigation</h3>
+                        <p>Use the navigation links and "Return to List" buttons to maintain your filtering context when moving between pages.</p>
+                    </section>
+
+                    <!-- Status Badges -->
+                    <section id="status-badges" class="mb-5">
+                        <h2>Status Badges</h2>
+                        <p>Callings are marked with color-coded status badges for easy identification:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Active Statuses</h4>
+                                <ul class="list-unstyled">
+                                    <li><span class="badge bg-info me-2">Pending</span> Awaiting approval from leadership</li>
+                                    <li><span class="badge bg-success me-2">Approved</span> Approved, ready for sustaining</li>
+                                    <li><span class="badge bg-warning me-2">On Hold</span> Temporarily paused</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Inactive Statuses</h4>
+                                <ul class="list-unstyled">
+                                    <li><span class="badge bg-success me-2">Completed</span> Sustained and serving</li>
+                                    <li><span class="badge bg-secondary me-2">LCR Updated</span> Updated in official records</li>
+                                    <li><span class="badge bg-danger me-2">Cancelled</span> No longer proceeding</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Workflows -->
+                    <section id="workflows" class="mb-5">
+                        <h2>Common Workflows</h2>
+                        
+                        <h3>New Calling Process</h3>
+                        <ol>
+                            <li><strong>Create:</strong> Admin creates calling with "Pending" status</li>
+                            <li><strong>Approve:</strong> Leadership reviews and changes status to "Approved"</li>
+                            <li><strong>Sustain:</strong> Person is sustained publicly, status changes to "Completed"</li>
+                            <li><strong>Update Records:</strong> LCR is updated, status changes to "LCR Updated"</li>
+                        </ol>
+                        
+                        <h3>Tracking Progress</h3>
+                        <ul>
+                            <li>Use the Dashboard to see all active callings at a glance</li>
+                            <li>Filter by "Active" to focus on callings that need attention</li>
+                            <li>Check dates to identify overdue items</li>
+                            <li>Use notes field to track additional context</li>
+                        </ul>
+                        
+                        <h3>Release Process</h3>
+                        <ol>
+                            <li>Create a new calling for the replacement</li>
+                            <li>Process the new calling through approval and sustaining</li>
+                            <li>Mark the original calling as "Completed" when release occurs</li>
+                            <li>Update LCR records for both positions</li>
+                        </ol>
+                    </section>
+
+                    <!-- Troubleshooting -->
+                    <section id="troubleshooting" class="mb-5">
+                        <h2>Troubleshooting</h2>
+                        
+                        <h3>Common Issues</h3>
+                        
+                        <h4>Can't Find a Calling</h4>
+                        <ul>
+                            <li>Check that you're not filtering by status (try "All" filter)</li>
+                            <li>Use the search box to search by name, position, or organization</li>
+                            <li>Try the "All Callings" view instead of "By Unit" view</li>
+                        </ul>
+                        
+                        <h4>Permission Denied</h4>
+                        <ul>
+                            <li>Only administrators can create, edit, or delete callings</li>
+                            <li>Contact your system administrator to request access</li>
+                            <li>Make sure you're logged in with the correct account</li>
+                        </ul>
+                        
+                        <h4>Page Not Loading</h4>
+                        <ul>
+                            <li>Refresh the page (F5 or Ctrl+R)</li>
+                            <li>Clear your browser cache and cookies</li>
+                            <li>Try a different browser</li>
+                            <li>Check your internet connection</li>
+                        </ul>
+                        
+                        <h4>Data Not Updating</h4>
+                        <ul>
+                            <li>Refresh the page to see latest changes</li>
+                            <li>Make sure you clicked "Save" after making edits</li>
+                            <li>Check that you have the necessary permissions</li>
+                        </ul>
+                        
+                        <h3>Getting Help</h3>
+                        <p>If you continue to experience issues:</p>
+                        <ul>
+                            <li>Contact your system administrator</li>
+                            <li>Check the Admin Guide for additional information</li>
+                            <li>Document the specific error message or behavior you're seeing</li>
+                        </ul>
+                        
+                        <div class="alert alert-success">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Pro Tip:</strong> Bookmark frequently used filtered views (like "Active Callings") for quick access.
+                        </div>
+                    </section>
+
+                    <!-- Footer -->
+                    <hr>
+                    <div class="text-muted text-center">
+                        <small>Last updated: {{ "now"|date:"F Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Highlight active nav links */
+.nav-link:hover {
+    background-color: #f8f9fa;
+}
+
+/* Add some spacing for sections */
+section {
+    padding-top: 60px;
+    margin-top: -60px;
+}
+</style>
+
+<script>
+// Highlight current section in navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    
+    window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active', 'bg-primary', 'text-white');
+            link.classList.add('text-dark');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active', 'bg-primary', 'text-white');
+                link.classList.remove('text-dark');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

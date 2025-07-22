@@ -60,7 +60,15 @@
                             <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Account</h6></li>
                             <li><a class="dropdown-item" href="{% url 'password_change' %}"><i class="fas fa-key"></i> Change Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Documentation</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'callings:user-guide' %}"><i class="fas fa-book"></i> User Guide</a></li>
+                            <li><a class="dropdown-item" href="{% url 'callings:admin-guide' %}"><i class="fas fa-cogs"></i> Admin Guide</a></li>
+                            {% if user.is_superuser %}
+                            <li><a class="dropdown-item" href="{% url 'callings:technical-guide' %}"><i class="fas fa-code"></i> Technical Docs</a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>

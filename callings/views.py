@@ -15,6 +15,9 @@ from datetime import timedelta, datetime
 from django.db.models.functions import TruncMonth
 from django.db.models import Count, F, Value, CharField
 from django.db.models.functions import Concat
+from django.http import HttpResponse, Http404
+import os
+from django.conf import settings
 
 from .models import Unit, Organization, Position, Calling
 from .forms import (
@@ -115,6 +118,20 @@ def dashboard(request):
         )
     
     return render(request, 'callings/dashboard.html', context)
+
+# Documentation Views
+
+class UserGuideView(LoginRequiredMixin, TitleMixin, TemplateView):
+    template_name = 'callings/docs/user-guide.html'
+    title = 'User Guide'
+
+class AdminGuideView(LoginRequiredMixin, TitleMixin, TemplateView):
+    template_name = 'callings/docs/admin-guide.html'
+    title = 'Administrator Guide'
+
+class TechnicalGuideView(LoginRequiredMixin, TitleMixin, TemplateView):
+    template_name = 'callings/docs/technical-guide.html'
+    title = 'Technical Documentation'
 
 # Unit Views
 class UnitListView(LoginRequiredMixin, TitleMixin, SortableMixin, ListView):

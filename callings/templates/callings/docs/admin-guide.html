@@ -1,0 +1,367 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}Administrator Guide - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Table of Contents -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Table of Contents</h5>
+                </div>
+                <div class="card-body p-0">
+                    <nav class="nav nav-pills flex-column p-2">
+                        <a class="nav-link text-dark" href="#overview">Overview</a>
+                        <a class="nav-link text-dark" href="#initial-setup">Initial Setup</a>
+                        <a class="nav-link text-dark" href="#user-management">User Management</a>
+                        <a class="nav-link text-dark" href="#data-management">Data Management</a>
+                        <a class="nav-link text-dark" href="#maintenance">Maintenance</a>
+                        <a class="nav-link text-dark" href="#troubleshooting">Troubleshooting</a>
+                        <a class="nav-link text-dark" href="#security">Security</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h1><i class="fas fa-cogs"></i> CallingTrack Administrator Guide</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Overview -->
+                    <section id="overview" class="mb-5">
+                        <h2>Overview</h2>
+                        <p class="lead">This guide covers system administration tasks for CallingTrack administrators and superusers.</p>
+                        
+                        <h3>Administrator Responsibilities</h3>
+                        <ul>
+                            <li>Managing user accounts and permissions</li>
+                            <li>Setting up and maintaining organizational data structure</li>
+                            <li>Creating and managing calling records</li>
+                            <li>System monitoring and maintenance</li>
+                            <li>Data backup and recovery</li>
+                            <li>Troubleshooting user issues</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Important:</strong> Only superusers have access to the Django admin interface. Regular administrators work through the main application interface.
+                        </div>
+                    </section>
+
+                    <!-- Initial Setup -->
+                    <section id="initial-setup" class="mb-5">
+                        <h2>Initial Setup</h2>
+                        
+                        <h3>Setting Up Organizational Structure</h3>
+                        <ol>
+                            <li><strong>Create Units:</strong>
+                                <ul>
+                                    <li>Navigate to Master Files → Units</li>
+                                    <li>Create your organizational units (Stakes, Wards, Branches)</li>
+                                    <li>Set parent-child relationships as needed</li>
+                                    <li>Assign sort orders for display ordering</li>
+                                </ul>
+                            </li>
+                            <li><strong>Create Organizations:</strong>
+                                <ul>
+                                    <li>Navigate to Master Files → Organizations</li>
+                                    <li>Create organizations within each unit (Bishopric, Relief Society, etc.)</li>
+                                    <li>Specify leader positions for each organization</li>
+                                </ul>
+                            </li>
+                            <li><strong>Define Positions:</strong>
+                                <ul>
+                                    <li>Navigate to Master Files → Positions</li>
+                                    <li>Create specific calling positions within each organization</li>
+                                    <li>Mark positions that require setting apart</li>
+                                    <li>Identify leadership positions</li>
+                                </ul>
+                            </li>
+                        </ol>
+
+                        <h3>User Account Setup</h3>
+                        <p>User accounts are managed through the Django admin interface (superuser access required):</p>
+                        <ol>
+                            <li>Access the Admin panel from the main navigation</li>
+                            <li>Navigate to Authentication and Authorization → Users</li>
+                            <li>Create user accounts with appropriate permissions</li>
+                            <li>Assign staff status for administrative access</li>
+                        </ol>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Tip:</strong> Start with a small subset of data to test the system before full deployment.
+                        </div>
+                    </section>
+
+                    <!-- User Management -->
+                    <section id="user-management" class="mb-5">
+                        <h2>User Management</h2>
+                        
+                        <h3>Permission Levels</h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5>Regular Users</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="small">
+                                            <li>View callings</li>
+                                            <li>Access documentation</li>
+                                            <li>Change own password</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5>Staff Users</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="small">
+                                            <li>All regular user permissions</li>
+                                            <li>Create/edit callings</li>
+                                            <li>Manage master data</li>
+                                            <li>View all system features</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-danger text-white">
+                                        <h5>Superusers</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="small">
+                                            <li>All staff permissions</li>
+                                            <li>Django admin access</li>
+                                            <li>User management</li>
+                                            <li>System configuration</li>
+                                            <li>Technical documentation access</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>User Account Management Tasks</h3>
+                        <ul>
+                            <li><strong>Creating Accounts:</strong> Use Django admin to create new user accounts</li>
+                            <li><strong>Password Resets:</strong> Assist users with password changes</li>
+                            <li><strong>Permission Updates:</strong> Modify user roles as organizational needs change</li>
+                            <li><strong>Account Deactivation:</strong> Disable accounts for users who no longer need access</li>
+                        </ul>
+                    </section>
+
+                    <!-- Data Management -->
+                    <section id="data-management" class="mb-5">
+                        <h2>Data Management</h2>
+                        
+                        <h3>Calling Lifecycle Management</h3>
+                        <ol>
+                            <li><strong>Creation:</strong> Create new callings with appropriate initial status</li>
+                            <li><strong>Status Updates:</strong> Track callings through their lifecycle stages</li>
+                            <li><strong>Documentation:</strong> Maintain notes and relevant dates</li>
+                            <li><strong>Completion:</strong> Mark callings as completed when appropriate</li>
+                            <li><strong>Archival:</strong> Update final status when LCR is updated</li>
+                        </ol>
+
+                        <h3>Master Data Maintenance</h3>
+                        <ul>
+                            <li><strong>Units:</strong> Update unit information as organizational changes occur</li>
+                            <li><strong>Organizations:</strong> Add or modify organizations within units</li>
+                            <li><strong>Positions:</strong> Maintain current position definitions</li>
+                            <li><strong>Sort Orders:</strong> Adjust display ordering as needed</li>
+                        </ul>
+
+                        <h3>Data Quality Best Practices</h3>
+                        <ul>
+                            <li>Use consistent naming conventions</li>
+                            <li>Keep status information current</li>
+                            <li>Document important dates accurately</li>
+                            <li>Use notes field for additional context</li>
+                            <li>Regularly review and clean up old data</li>
+                        </ul>
+                    </section>
+
+                    <!-- Maintenance -->
+                    <section id="maintenance" class="mb-5">
+                        <h2>System Maintenance</h2>
+                        
+                        <h3>Regular Maintenance Tasks</h3>
+                        <ul>
+                            <li><strong>Data Review:</strong> Regularly review calling statuses and update as needed</li>
+                            <li><strong>User Accounts:</strong> Audit user accounts and permissions periodically</li>
+                            <li><strong>System Performance:</strong> Monitor application performance and response times</li>
+                            <li><strong>Log Review:</strong> Check system logs for errors or issues</li>
+                        </ul>
+
+                        <h3>Backup and Recovery</h3>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>Critical:</strong> Regular backups are essential for data protection.
+                        </div>
+                        <ul>
+                            <li>Coordinate with IT staff for database backups</li>
+                            <li>Test backup restoration procedures</li>
+                            <li>Document recovery processes</li>
+                            <li>Maintain backup schedules</li>
+                        </ul>
+
+                        <h3>System Monitoring</h3>
+                        <p>Key areas to monitor:</p>
+                        <ul>
+                            <li>Application availability and uptime</li>
+                            <li>Database performance</li>
+                            <li>User login issues</li>
+                            <li>Error rates and system logs</li>
+                            <li>Storage space usage</li>
+                        </ul>
+                    </section>
+
+                    <!-- Troubleshooting -->
+                    <section id="troubleshooting" class="mb-5">
+                        <h2>Administrator Troubleshooting</h2>
+                        
+                        <h3>Common Administrative Issues</h3>
+                        
+                        <h4>User Cannot Login</h4>
+                        <ul>
+                            <li>Verify account is active in Django admin</li>
+                            <li>Check password hasn't expired</li>
+                            <li>Confirm user has correct permissions</li>
+                            <li>Reset password if necessary</li>
+                        </ul>
+
+                        <h4>Data Not Saving</h4>
+                        <ul>
+                            <li>Check user permissions for the specific action</li>
+                            <li>Verify required fields are completed</li>
+                            <li>Review Django admin logs for errors</li>
+                            <li>Check database connectivity</li>
+                        </ul>
+
+                        <h4>Performance Issues</h4>
+                        <ul>
+                            <li>Review database query performance</li>
+                            <li>Check server resource utilization</li>
+                            <li>Clear browser cache</li>
+                            <li>Monitor concurrent user load</li>
+                        </ul>
+
+                        <h3>Diagnostic Tools</h3>
+                        <ul>
+                            <li><strong>Django Admin:</strong> User management and data verification</li>
+                            <li><strong>Server Logs:</strong> Application and error logging</li>
+                            <li><strong>Database Tools:</strong> Direct database access for data verification</li>
+                            <li><strong>Browser Developer Tools:</strong> Client-side debugging</li>
+                        </ul>
+                    </section>
+
+                    <!-- Security -->
+                    <section id="security" class="mb-5">
+                        <h2>Security Considerations</h2>
+                        
+                        <h3>Access Control</h3>
+                        <ul>
+                            <li>Regularly audit user accounts and permissions</li>
+                            <li>Remove access for users who no longer need it</li>
+                            <li>Use principle of least privilege</li>
+                            <li>Monitor login activity</li>
+                        </ul>
+
+                        <h3>Data Protection</h3>
+                        <ul>
+                            <li>Ensure sensitive data is properly protected</li>
+                            <li>Use HTTPS for all communications</li>
+                            <li>Implement proper backup encryption</li>
+                            <li>Follow organizational data handling policies</li>
+                        </ul>
+
+                        <h3>Password Policies</h3>
+                        <ul>
+                            <li>Enforce strong password requirements</li>
+                            <li>Regular password change reminders</li>
+                            <li>Account lockout after failed attempts</li>
+                            <li>Secure password reset procedures</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-shield-alt"></i>
+                            <strong>Security Reminder:</strong> Always log out when finished and never share administrative credentials.
+                        </div>
+                    </section>
+
+                    <!-- Support Information -->
+                    <div class="alert alert-primary">
+                        <h4><i class="fas fa-question-circle"></i> Need Additional Help?</h4>
+                        <p class="mb-2">For technical issues beyond this guide:</p>
+                        <ul class="mb-0">
+                            <li>Consult the Technical Documentation (superuser access)</li>
+                            <li>Contact your IT support team</li>
+                            <li>Review Django documentation for advanced admin tasks</li>
+                        </ul>
+                    </div>
+
+                    <!-- Footer -->
+                    <hr>
+                    <div class="text-muted text-center">
+                        <small>Last updated: {{ "now"|date:"F Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Highlight active nav links */
+.nav-link:hover {
+    background-color: #f8f9fa;
+}
+
+/* Add some spacing for sections */
+section {
+    padding-top: 60px;
+    margin-top: -60px;
+}
+</style>
+
+<script>
+// Highlight current section in navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    
+    window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active', 'bg-primary', 'text-white');
+            link.classList.add('text-dark');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active', 'bg-primary', 'text-white');
+                link.classList.remove('text-dark');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

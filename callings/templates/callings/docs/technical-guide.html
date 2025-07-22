@@ -1,0 +1,408 @@
+{% extends 'callings/base.html' %}
+
+{% block title %}Technical Documentation - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Table of Contents -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Table of Contents</h5>
+                </div>
+                <div class="card-body p-0">
+                    <nav class="nav nav-pills flex-column p-2">
+                        <a class="nav-link text-dark" href="#overview">Overview</a>
+                        <a class="nav-link text-dark" href="#architecture">Architecture</a>
+                        <a class="nav-link text-dark" href="#models">Data Models</a>
+                        <a class="nav-link text-dark" href="#views">Views</a>
+                        <a class="nav-link text-dark" href="#templates">Templates</a>
+                        <a class="nav-link text-dark" href="#deployment">Deployment</a>
+                        <a class="nav-link text-dark" href="#development">Development</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h1><i class="fas fa-code"></i> CallingTrack Technical Documentation</h1>
+                </div>
+                <div class="card-body">
+                    <!-- Overview -->
+                    <section id="overview" class="mb-5">
+                        <h2>Technical Overview</h2>
+                        <p class="lead">CallingTrack is a Django-based web application for managing church callings and organizational positions.</p>
+                        
+                        <h3>Technology Stack</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Backend</h4>
+                                <ul>
+                                    <li>Django 4.x</li>
+                                    <li>Python 3.8+</li>
+                                    <li>SQLite (development)</li>
+                                    <li>PostgreSQL/MySQL (production)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Frontend</h4>
+                                <ul>
+                                    <li>Bootstrap 5</li>
+                                    <li>Chart.js</li>
+                                    <li>Font Awesome</li>
+                                    <li>HTML5/CSS3/JavaScript</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Project Structure</h3>
+                        <pre><code>CallingTrack/
+├── callingtrack/          # Django project settings
+│   ├── settings.py        # Main configuration
+│   ├── urls.py           # Root URL configuration
+│   └── wsgi.py           # WSGI configuration
+├── callings/             # Main Django app
+│   ├── models.py         # Data models
+│   ├── views.py          # View logic
+│   ├── forms.py          # Form definitions
+│   ├── urls.py           # App URL patterns
+│   ├── admin.py          # Django admin configuration
+│   └── templates/        # HTML templates
+├── static/               # Static files (CSS, JS, images)
+├── media/               # User uploaded files
+└── docs/               # Documentation files</code></pre>
+                    </section>
+
+                    <!-- Architecture -->
+                    <section id="architecture" class="mb-5">
+                        <h2>Architecture</h2>
+                        
+                        <h3>Django MVT Pattern</h3>
+                        <p>The application follows Django's Model-View-Template architecture:</p>
+                        <ul>
+                            <li><strong>Models:</strong> Data structure and business logic</li>
+                            <li><strong>Views:</strong> Request handling and response generation</li>
+                            <li><strong>Templates:</strong> HTML presentation layer</li>
+                        </ul>
+
+                        <h3>Key Design Patterns</h3>
+                        <ul>
+                            <li><strong>Class-Based Views:</strong> Extensive use of Django's generic views</li>
+                            <li><strong>Mixins:</strong> Reusable functionality across views</li>
+                            <li><strong>Template Inheritance:</strong> Base template with block overrides</li>
+                            <li><strong>URL Namespacing:</strong> Organized URL patterns</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> The application uses Django's built-in authentication system with custom permission checking.
+                        </div>
+                    </section>
+
+                    <!-- Models -->
+                    <section id="models" class="mb-5">
+                        <h2>Data Models</h2>
+                        
+                        <h3>Core Models</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Unit</h4>
+                                <p>Organizational units (Stakes, Wards, Branches)</p>
+                                <ul class="small">
+                                    <li>name, unit_type</li>
+                                    <li>parent_unit (self-referential)</li>
+                                    <li>sort_order, is_active</li>
+                                    <li>meeting_time, address</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Organization</h4>
+                                <p>Organizations within units</p>
+                                <ul class="small">
+                                    <li>name, unit (ForeignKey)</li>
+                                    <li>leader_position</li>
+                                    <li>sort_order</li>
+                                    <li>description</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h4>Position</h4>
+                                <p>Specific calling positions</p>
+                                <ul class="small">
+                                    <li>title, organization (ForeignKey)</li>
+                                    <li>requires_setting_apart</li>
+                                    <li>is_leadership</li>
+                                    <li>sort_order, description</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Calling</h4>
+                                <p>Main calling tracking entity</p>
+                                <ul class="small">
+                                    <li>unit, organization, position (ForeignKeys)</li>
+                                    <li>status (choices)</li>
+                                    <li>name, proposed_replacement</li>
+                                    <li>date fields, notes</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Model Relationships</h3>
+                        <ul>
+                            <li>Unit → Organization (One-to-Many)</li>
+                            <li>Organization → Position (One-to-Many)</li>
+                            <li>Unit/Organization/Position → Calling (Foreign Keys)</li>
+                        </ul>
+
+                        <h3>Status Choices</h3>
+                        <pre><code>STATUS_CHOICES = [
+    ('PENDING', 'Pending'),
+    ('APPROVED', 'Approved'),
+    ('COMPLETED', 'Completed'),
+    ('LCR_UPDATED', 'LCR Updated'),
+    ('ON_HOLD', 'On Hold'),
+    ('CANCELLED', 'Cancelled'),
+]</code></pre>
+                    </section>
+
+                    <!-- Views -->
+                    <section id="views" class="mb-5">
+                        <h2>Views</h2>
+                        
+                        <h3>View Types</h3>
+                        <ul>
+                            <li><strong>Function-Based:</strong> Dashboard view</li>
+                            <li><strong>Class-Based:</strong> CRUD operations using generic views</li>
+                            <li><strong>Template Views:</strong> Documentation pages</li>
+                        </ul>
+
+                        <h3>Custom Mixins</h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h4>SuperuserRequiredMixin</h4>
+                                <p class="small">Restricts access to superusers only</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4>TitleMixin</h4>
+                                <p class="small">Provides consistent page titles</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4>SortableMixin</h4>
+                                <p class="small">Adds sortable functionality to list views</p>
+                            </div>
+                        </div>
+
+                        <h3>Key Views</h3>
+                        <ul>
+                            <li><strong>Dashboard:</strong> Main overview with statistics</li>
+                            <li><strong>CallingListView:</strong> Paginated calling list</li>
+                            <li><strong>CallingsByUnitView:</strong> Callings grouped by unit</li>
+                            <li><strong>CallingUpdateView:</strong> Smart return navigation</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Important:</strong> Most views require authentication. CRUD operations require staff permissions.
+                        </div>
+                    </section>
+
+                    <!-- Templates -->
+                    <section id="templates" class="mb-5">
+                        <h2>Templates</h2>
+                        
+                        <h3>Template Structure</h3>
+                        <pre><code>templates/callings/
+├── base.html              # Base template with navigation
+├── dashboard.html         # Dashboard page
+├── calling/
+│   ├── calling_list.html
+│   ├── callings_by_unit.html
+│   ├── calling_detail.html
+│   └── calling_form.html
+├── unit/
+├── organization/
+├── position/
+└── docs/                  # Documentation templates</code></pre>
+
+                        <h3>Template Features</h3>
+                        <ul>
+                            <li><strong>Bootstrap 5:</strong> Responsive design framework</li>
+                            <li><strong>Template Inheritance:</strong> Consistent layout</li>
+                            <li><strong>Dynamic Navigation:</strong> Context-aware menus</li>
+                            <li><strong>Status Badges:</strong> Color-coded status indicators</li>
+                        </ul>
+
+                        <h3>JavaScript Integration</h3>
+                        <ul>
+                            <li><strong>Chart.js:</strong> Dashboard statistics visualization</li>
+                            <li><strong>Bootstrap JS:</strong> Interactive components</li>
+                            <li><strong>Custom Scripts:</strong> Application-specific functionality</li>
+                        </ul>
+                    </section>
+
+                    <!-- Deployment -->
+                    <section id="deployment" class="mb-5">
+                        <h2>Deployment</h2>
+                        
+                        <h3>Environment Configuration</h3>
+                        <pre><code># Environment Variables
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=your-domain.com,localhost
+DATABASE_URL=postgresql://user:pass@host:port/db</code></pre>
+
+                        <h3>Production Settings</h3>
+                        <ul>
+                            <li><strong>Database:</strong> PostgreSQL or MySQL recommended</li>
+                            <li><strong>Web Server:</strong> Nginx with Gunicorn/uWSGI</li>
+                            <li><strong>SSL:</strong> HTTPS enforced in production</li>
+                            <li><strong>Static Files:</strong> Served by web server</li>
+                        </ul>
+
+                        <h3>Security Settings</h3>
+                        <pre><code>SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True</code></pre>
+
+                        <h3>Database Migration</h3>
+                        <pre><code>python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic</code></pre>
+                    </section>
+
+                    <!-- Development -->
+                    <section id="development" class="mb-5">
+                        <h2>Development</h2>
+                        
+                        <h3>Local Development Setup</h3>
+                        <ol>
+                            <li>Clone the repository</li>
+                            <li>Create virtual environment</li>
+                            <li>Install dependencies: <code>pip install -r requirements.txt</code></li>
+                            <li>Run migrations: <code>python manage.py migrate</code></li>
+                            <li>Create superuser: <code>python manage.py createsuperuser</code></li>
+                            <li>Run development server: <code>python manage.py runserver</code></li>
+                        </ol>
+
+                        <h3>Development Tools</h3>
+                        <ul>
+                            <li><strong>Django Debug Toolbar:</strong> Development debugging</li>
+                            <li><strong>Django Admin:</strong> Data management interface</li>
+                            <li><strong>Django Shell:</strong> Interactive Python environment</li>
+                        </ul>
+
+                        <h3>Testing</h3>
+                        <pre><code># Run tests
+python manage.py test
+
+# Test specific app
+python manage.py test callings
+
+# Test with coverage
+coverage run --source='.' manage.py test
+coverage html</code></pre>
+
+                        <h3>Code Organization</h3>
+                        <ul>
+                            <li><strong>Models:</strong> Business logic and data validation</li>
+                            <li><strong>Views:</strong> Request handling, minimal business logic</li>
+                            <li><strong>Forms:</strong> Data validation and cleaning</li>
+                            <li><strong>Templates:</strong> Presentation logic only</li>
+                        </ul>
+
+                        <div class="alert alert-success">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Development Tip:</strong> Use Django's built-in development server and SQLite for local development.
+                        </div>
+                    </section>
+
+                    <!-- API Information -->
+                    <div class="alert alert-info">
+                        <h4><i class="fas fa-info-circle"></i> API Development</h4>
+                        <p class="mb-2">For future API development, consider:</p>
+                        <ul class="mb-0">
+                            <li>Django REST Framework for RESTful APIs</li>
+                            <li>API versioning strategy</li>
+                            <li>Authentication and permissions</li>
+                            <li>Rate limiting and throttling</li>
+                        </ul>
+                    </div>
+
+                    <!-- Footer -->
+                    <hr>
+                    <div class="text-muted text-center">
+                        <small>Technical documentation last updated: {{ "now"|date:"F Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Code blocks */
+pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Highlight active nav links */
+.nav-link:hover {
+    background-color: #f8f9fa;
+}
+
+/* Add some spacing for sections */
+section {
+    padding-top: 60px;
+    margin-top: -60px;
+}
+</style>
+
+<script>
+// Highlight current section in navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    
+    window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active', 'bg-primary', 'text-white');
+            link.classList.add('text-dark');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active', 'bg-primary', 'text-white');
+                link.classList.remove('text-dark');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

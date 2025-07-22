@@ -37,4 +37,9 @@ urlpatterns = [
     path('callings/<int:pk>/release/', views.CallingReleaseView.as_view(), name='calling-release'),
     path('callings/<int:pk>/lcr-update/', views.CallingLCRUpdateView.as_view(), name='calling-lcr-update'),
     path('callings/<int:pk>/update-status/<str:new_status>/', views.CallingUpdateStatusView.as_view(), name='calling-update-status'),
+    
+    # Documentation URLs
+    path('docs/user-guide/', views.UserGuideView.as_view(), name='user-guide'),
+    path('docs/admin-guide/', views.AdminGuideView.as_view(), name='admin-guide'),
+    path('docs/technical-guide/', views.TechnicalGuideView.as_view(), name='technical-guide'),
 ]
