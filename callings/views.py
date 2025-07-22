@@ -67,7 +67,7 @@ class SortableMixin:
 @login_required
 def dashboard(request):
     """
-    Dashboard view showing recent callings, statistics, and upcoming events.
+    Dashboard view showing active callings and statistics.
     """
     from django.apps import apps
     
@@ -75,51 +75,34 @@ def dashboard(request):
         'title': 'Dashboard',
     }
     
-    # Get recent callings for the current user's unit
-    recent_callings = Calling.objects.select_related('position', 'unit')
+    # Get active callings (not COMPLETED, LCR_UPDATED, or CANCELLED)
+    active_callings_queryset = Calling.objects.exclude(
+        status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED']
+    ).select_related('position', 'unit', 'organization')
     
     # If user has specific units assigned, filter by those
     if hasattr(request.user, 'units'):
-        recent_callings = recent_callings.filter(unit__in=request.user.units.all())
+        active_callings_queryset = active_callings_queryset.filter(unit__in=request.user.units.all())
     
     # Get counts for dashboard cards
     context['total_units'] = Unit.objects.count()
-    context['total_callings'] = Calling.objects.filter(is_active=True).count()
-    # Use new Active definition: not COMPLETED, LCR_UPDATED, or CANCELLED
-    context['active_callings'] = Calling.objects.exclude(status__in=['COMPLETED', 'LCR_UPDATED', 'CANCELLED']).count()
-    context['recent_callings'] = recent_callings.order_by('-created_at')[:10]
+    context['total_callings'] = Calling.objects.count()
+    context['active_callings_count'] = active_callings_queryset.count()
     
-    # Get upcoming events (next 30 days)
-    today = timezone.now().date()
-    thirty_days_later = today + timedelta(days=30)
-    
-    # Upcoming releases
-    context['upcoming_releases'] = Calling.objects.filter(
-        date_released__isnull=False,
-        date_released__gte=today,
-        date_released__lte=thirty_days_later,
-        is_active=True
-    ).select_related('position').order_by('date_released')[:10]
-    
-    # Upcoming callings and other events (callings that have future dates or pending approval)
-    context['upcoming_callings'] = Calling.objects.filter(
-        Q(date_called__range=[today, thirty_days_later]) |
-        Q(date_sustained__range=[today, thirty_days_later]) |
-        Q(date_set_apart__range=[today, thirty_days_later]) |
-        Q(status__in=['PENDING', 'APPROVED'], date_called__isnull=True) |
-        Q(status='APPROVED', date_sustained__isnull=True) |
-        Q(status='APPROVED', date_set_apart__isnull=True, position__requires_setting_apart=True)
-    ).select_related('position', 'unit').order_by('date_called', 'date_sustained', 'date_set_apart')[:5]
+    # Get active callings for display (limit to 15)
+    context['active_callings'] = active_callings_queryset.order_by(
+        'unit__sort_order', 'unit__name', 'organization__name', 'position__title'
+    )[:15]
     
     # Get calling statistics by status
     context['calling_status_stats'] = (
-        Calling.objects.values('calling_status')
-        .annotate(count=Count('calling_status'))
+        Calling.objects.values('status')
+        .annotate(count=Count('status'))
         .order_by('-count')
     )
     
     # For the chart
-    context['calling_status_data'] = list(Calling.objects.values('calling_status')
+    context['calling_status_data'] = list(Calling.objects.values('status')
         .annotate(count=Count('id')))
     
     # Get recent activities (last 10 changes)
@@ -642,7 +625,11 @@ class CallingUpdateView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin, 
                 query_string = urlencode({k: v[0] for k, v in query_params.items()})
                 return reverse_lazy('callings:calling-list') + f'?{query_string}'
             return reverse_lazy('callings:calling-list')
-        return None
+        elif referer and (referer.endswith('/') or 'dashboard' in referer):
+            # If coming from dashboard (root URL or dashboard), return to dashboard
+            return reverse_lazy('dashboard')
+        # Default fallback
+        return reverse_lazy('callings:callings-by-unit')
     
     def get_success_url(self):
         # Check if a return URL was provided in the POST data

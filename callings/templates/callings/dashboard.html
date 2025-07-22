@@ -56,7 +56,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-uppercase text-muted mb-0">Active Callings</h6>
-                            <h2 class="mb-0">{{ active_callings|intcomma }}</h2>
+                            <h2 class="mb-0">{{ active_callings_count|intcomma }}</h2>
                         </div>
                         <div class="bg-warning bg-opacity-10 p-3 rounded">
                             <i class="fas fa-user-check fa-2x text-warning"></i>
@@ -69,12 +69,12 @@
 </div>
 
 <div class="row g-4">
-    <!-- Recent Callings -->
+    <!-- Active Callings -->
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Recent Callings</h5>
-                <a href="{% url 'callings:calling-list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                <h5 class="mb-0">Active Callings</h5>
+                <a href="{% url 'callings:calling-list' %}?status=active" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -84,15 +84,17 @@
                                 <th>Member</th>
                                 <th>Position</th>
                                 <th>Unit</th>
-                                <th>Date Created</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for calling in recent_callings %}
+                            {% for calling in active_callings %}
                             <tr>
                                 <td>
-                                    {{ calling.name }}
+                                    <a href="{% url 'callings:calling-update' calling.id %}" class="text-decoration-none">
+                                        {{ calling.name|default:"—" }}
+                                    </a>
                                 </td>
                                 <td>
                                     <a href="{% url 'callings:position-detail' calling.position.id %}">
@@ -100,18 +102,27 @@
                                     </a>
                                 </td>
                                 <td>{{ calling.unit.name }}</td>
-                                <td>{{ calling.created_at|date:"M d, Y" }}</td>
                                 <td>
-                                    <span class="badge bg-{{ calling.calling_status|lower }}">
-                                        {{ calling.get_calling_status_display }}
+                                    <span class="badge bg-{{ calling.get_status_badge_class }}">
+                                        {{ calling.get_status_display }}
                                     </span>
+                                </td>
+                                <td>
+                                    <a href="{{ calling.get_absolute_url }}" class="text-primary me-2" 
+                                       data-bs-toggle="tooltip" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'callings:calling-update' calling.pk %}" class="text-secondary"
+                                       data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
                                 <td colspan="5" class="text-center py-4">
                                     <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
-                                    <p class="mb-0">No recent callings found</p>
+                                    <p class="mb-0">No active callings found</p>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -122,44 +133,14 @@
         </div>
     </div>
     
-    <!-- Upcoming Callings -->
+    <!-- Status Chart -->
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Upcoming Callings</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    {% for calling in upcoming_callings %}
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ calling.name }}</h6>
-                            <small class="text-muted">
-                                {% if calling.date_called %}{{ calling.date_called|date:"M d" }}{% endif %}
-                                {% if calling.date_sustained %}<i class="fas fa-arrow-right mx-1"></i>{% endif %}
-                                {% if calling.date_sustained %}{{ calling.date_sustained|date:"M d" }}{% endif %}
-                            </small>
-                        </div>
-                        <p class="mb-1">{{ calling.position.title }}</p>
-                        <small class="text-muted">{{ calling.unit.name }}</small>
-                    </div>
-                    {% empty %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-calendar-alt fa-2x text-muted mb-2"></i>
-                        <p class="mb-0">No upcoming callings</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Status Chart (Placeholder) -->
-        <div class="card mt-4">
             <div class="card-header">
                 <h5 class="mb-0">Callings by Status</h5>
             </div>
             <div class="card-body">
-                <div id="statusChart" style="height: 200px;">
+                <div id="statusChart" style="height: 300px;">
                     <!-- Chart will be rendered here by JavaScript -->
                     <div class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">

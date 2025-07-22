@@ -275,10 +275,10 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ return_url|default_if_none:'/callings/' }}" class="btn btn-outline-primary me-md-2">
+                            <a href="{{ return_url|default_if_none:'' }}{% if not return_url %}{% url 'callings:callings-by-unit' %}{% endif %}" class="btn btn-outline-primary me-md-2">
                                 <i class="fas fa-list"></i> Return to List
                             </a>
-                            <a href="{% if form.instance.pk %}{% url 'callings:calling-detail' form.instance.pk %}{% else %}{{ return_url|default_if_none:'/callings/' }}{% endif %}" 
+                            <a href="{% if form.instance.pk %}{% url 'callings:calling-detail' form.instance.pk %}{% else %}{{ return_url|default_if_none:'' }}{% if not return_url %}{% url 'callings:callings-by-unit' %}{% endif %}{% endif %}" 
                                class="btn btn-outline-secondary me-md-2">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
