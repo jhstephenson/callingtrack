@@ -126,21 +126,8 @@ class Calling(models.Model):
         ('CANCELLED', 'Cancelled'),
         ('ON_HOLD', 'On Hold'),
         ('CALLED', 'Called'),
-        ('LCR_UPDATED', 'LCR Updated'),
-    ]
-    
-    CALLING_STATUS_CHOICES = [
-        ('ACTIVE', 'Active'),
         ('RELEASED', 'Released'),
-        ('PENDING', 'Pending Approval'),
-        ('CALLED', 'Called'),
-    ]
-    
-    APPROVAL_STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-        ('NOT_REQUIRED', 'Not Required'),
-        ('DECLINED', 'Declined'),
+        ('LCR_UPDATED', 'LCR Updated'),
     ]
     
     # Core relationships - all required
@@ -151,7 +138,6 @@ class Calling(models.Model):
     
     # Status fields
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='PENDING')
-    calling_status = models.CharField(max_length=10, choices=CALLING_STATUS_CHOICES, default='ACTIVE')
     is_active = models.BooleanField(default=True, help_text="Whether this calling is currently active")
     
     # Date fields
@@ -161,27 +147,25 @@ class Calling(models.Model):
     date_released = models.DateField(null=True, blank=True, help_text="Date when the calling was released")
     
     # Approval status fields
-    calling_approval_status = models.CharField(
-        max_length=15, 
-        choices=APPROVAL_STATUS_CHOICES, 
-        default='PENDING',
-        help_text="Approval status of the calling"
-    )
-    sustaining_approval_status = models.CharField(
-        max_length=15, 
-        choices=APPROVAL_STATUS_CHOICES, 
-        default='NOT_REQUIRED',
-        help_text="Approval status of the sustaining"
-    )
     setting_apart_approval_status = models.CharField(
         max_length=15, 
-        choices=APPROVAL_STATUS_CHOICES, 
+        choices=[
+            ('PENDING', 'Pending'),
+            ('APPROVED', 'Approved'),
+            ('NOT_REQUIRED', 'Not Required'),
+            ('DECLINED', 'Declined'),
+        ], 
         default='NOT_REQUIRED',
         help_text="Approval status of the setting apart"
     )
     released_approval_status = models.CharField(
         max_length=15, 
-        choices=APPROVAL_STATUS_CHOICES, 
+        choices=[
+            ('PENDING', 'Pending'),
+            ('APPROVED', 'Approved'),
+            ('NOT_REQUIRED', 'Not Required'),
+            ('DECLINED', 'Declined'),
+        ], 
         default='NOT_REQUIRED',
         help_text="Approval status of the release"
     )
@@ -278,8 +262,6 @@ class Calling(models.Model):
     def get_approval_status_class(self, approval_type):
         """Return CSS class for approval status badges"""
         status_map = {
-            'calling': self.calling_approval_status,
-            'sustaining': self.sustaining_approval_status,
             'setting_apart': self.setting_apart_approval_status,
             'released': self.released_approval_status,
         }
