@@ -239,12 +239,20 @@ class Calling(models.Model):
     def __str__(self):
         return f"{self.name} - {self.position} in {self.organization} ({self.unit})"
 
+    def get_display_name(self):
+        """Get the name with (N/R) suffix if release date is null or empty."""
+        if self.name:
+            if not self.date_released:
+                return f"{self.name} (N/R)"
+            return self.name
+        return self.name
+
     def get_list_display(self):
         return [
             self.unit,
             self.organization,
             self.position,
-            self.name,
+            self.get_display_name(),
             self.proposed_replacement or '',
             self.get_status_display()
         ]

@@ -115,7 +115,7 @@
                                     {{ calling.get_status_display }}
                                 </span>
                             </div>
-                            <p class="mb-1">{{ calling.name }}</p>
+                            <p class="mb-1">{{ calling.get_display_name }}</p>
                             <small class="text-muted">
                                 Called on {{ calling.date_called|date:"M d, Y" }}
                                 {% if calling.date_sustained %}

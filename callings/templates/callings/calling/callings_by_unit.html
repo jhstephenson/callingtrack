@@ -88,7 +88,7 @@
                         <tr>
                             <td>{{ calling.organization }}</td>
                             <td>{{ calling.position }}</td>
-                            <td>{{ calling.name|default:"—" }}</td>
+                            <td>{{ calling.get_display_name|default:"—" }}</td>
                             <td>{{ calling.proposed_replacement|default:"—" }}</td>
                             <td>
                                 <span class="badge bg-{{ calling.get_status_badge_class }}">

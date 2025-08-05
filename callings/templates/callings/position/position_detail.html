@@ -66,7 +66,7 @@
                         <div class="flex-grow-1 ms-3">
                             <h5 class="mb-1">
                                 <a href="{% url 'callings:calling-detail' current_calling.pk %}">
-                                    {{ current_calling.name }}
+                                    {{ current_calling.get_display_name }}
                                 </a>
                             </h5>
                             <p class="mb-1">
@@ -115,7 +115,7 @@
                         {% for calling in past_callings %}
                         <a href="{% url 'callings:calling-detail' calling.pk %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ calling.name }}</h6>
+                                <h6 class="mb-1">{{ calling.get_display_name }}</h6>
                                 <span class="badge bg-{{ calling.get_status_badge_class }}">
                                     {{ calling.get_status_display }}
                                 </span>
