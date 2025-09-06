@@ -102,7 +102,14 @@ class Position(models.Model):
     
     def get_current_holder(self):
         """Get the current holder of this position"""
-        active_calling = self.callings.filter(calling_status='ACTIVE', is_active=True).first()
+        # Find callings that are not completed, cancelled, LCR updated, or released
+        # and don't have a release date
+        active_calling = self.callings.filter(
+            is_active=True,
+            date_released__isnull=True
+        ).exclude(
+            status__in=['COMPLETED', 'CANCELLED', 'LCR_UPDATED', 'RELEASED']
+        ).first()
         return active_calling.name if active_calling else None
     
     def get_list_display(self):

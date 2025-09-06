@@ -698,7 +698,7 @@ class CallingReleaseView(LoginRequiredMixin, SuperuserRequiredMixin, TitleMixin,
         return f"Release Calling: {self.get_object().position.title}"
     
     def form_valid(self, form):
-        form.instance.calling_status = 'RELEASED'
+        form.instance.status = 'RELEASED'
         form.instance.date_released = timezone.now().date()
         messages.success(self.request, 'Calling has been released successfully.')
         return super().form_valid(form)

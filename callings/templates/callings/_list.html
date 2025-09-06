@@ -60,16 +60,16 @@
                             <td>{{ field }}</td>
                             {% endfor %}
                             <td class="text-end">
-                                <div class="btn-group" role="group">
-                                    <a href="{{ item.get_absolute_url }}" class="btn btn-sm btn-outline-primary" 
+                                <div class="d-flex gap-2 justify-content-end" role="group">
+                                    <a href="{{ item.get_absolute_url }}" class="text-primary text-decoration-none" 
                                        data-bs-toggle="tooltip" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{% url update_url item.pk %}" class="btn btn-sm btn-outline-secondary"
+                                    <a href="{% url update_url item.pk %}" class="text-secondary text-decoration-none"
                                        data-bs-toggle="tooltip" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url delete_url item.pk %}" class="btn btn-sm btn-outline-danger"
+                                    <a href="{% url delete_url item.pk %}" class="text-danger text-decoration-none"
                                        data-bs-toggle="tooltip" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </a>
