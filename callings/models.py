@@ -129,11 +129,9 @@ class Calling(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('APPROVED', 'Approved'),
-        ('COMPLETED', 'Completed'),
         ('CANCELLED', 'Cancelled'),
         ('ON_HOLD', 'On Hold'),
         ('CALLED', 'Called'),
-        ('RELEASED', 'Released'),
         ('LCR_UPDATED', 'LCR Updated'),
     ]
     
