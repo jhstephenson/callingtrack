@@ -151,29 +151,7 @@ class Calling(models.Model):
     date_set_apart = models.DateField(null=True, blank=True, help_text="Date when the member was set apart")
     date_released = models.DateField(null=True, blank=True, help_text="Date when the calling was released")
     
-    # Approval status fields
-    setting_apart_approval_status = models.CharField(
-        max_length=15, 
-        choices=[
-            ('PENDING', 'Pending'),
-            ('APPROVED', 'Approved'),
-            ('NOT_REQUIRED', 'Not Required'),
-            ('DECLINED', 'Declined'),
-        ], 
-        default='NOT_REQUIRED',
-        help_text="Approval status of the setting apart"
-    )
-    released_approval_status = models.CharField(
-        max_length=15, 
-        choices=[
-            ('PENDING', 'Pending'),
-            ('APPROVED', 'Approved'),
-            ('NOT_REQUIRED', 'Not Required'),
-            ('DECLINED', 'Declined'),
-        ], 
-        default='NOT_REQUIRED',
-        help_text="Approval status of the release"
-    )
+    # Approval status fields removed - using date-based approval tracking instead
     
     # Approval details
     called_by = models.CharField(
@@ -272,23 +250,7 @@ class Calling(models.Model):
             
         super().save(*args, **kwargs)
     
-    def get_approval_status_class(self, approval_type):
-        """Return CSS class for approval status badges"""
-        status_map = {
-            'setting_apart': self.setting_apart_approval_status,
-            'released': self.released_approval_status,
-        }
-        
-        status = status_map.get(approval_type, 'PENDING')
-        
-        class_map = {
-            'PENDING': 'warning',
-            'APPROVED': 'success',
-            'NOT_REQUIRED': 'secondary',
-            'DECLINED': 'danger',
-        }
-        
-        return class_map.get(status, 'secondary')
+    # get_approval_status_class method removed - no longer needed without approval status fields
     
     def get_status_badge_class(self):
         """Return CSS class for status badges"""
