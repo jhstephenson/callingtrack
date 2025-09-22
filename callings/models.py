@@ -128,8 +128,8 @@ class Position(models.Model):
 class Calling(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-        ('CANCELLED', 'Cancelled'),
+        ('APPROVED', 'Stake Presidency Approved'),
+        ('HC_APPROVED', 'High Council Approved'),
         ('ON_HOLD', 'On Hold'),
         ('CALLED', 'Called'),
         ('LCR_UPDATED', 'LCR Updated'),
