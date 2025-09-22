@@ -2,14 +2,16 @@
 
 ## Architecture Overview
 
-CallingTrack is built using Django 4.x with a Model-View-Template (MVT) architecture.
+CallingTrack is built using Django 5.2.4 with a Model-View-Template (MVT) architecture.
 
 ### Technology Stack
-- **Backend**: Django 4.x, Python 3.8+
-- **Database**: SQLite (development), PostgreSQL/MySQL (production)
-- **Frontend**: Bootstrap 5, HTML5, JavaScript
-- **Charts**: Chart.js
-- **Icons**: Font Awesome
+- **Backend**: Django 5.2.4, Python 3.12+ (3.8+ supported)
+- **Database**: SQLite (development), PostgreSQL (production)
+- **Frontend**: Bootstrap 5.3.0, HTML5, JavaScript ES6
+- **Charts**: Chart.js for dashboard analytics
+- **Icons**: Font Awesome 6
+- **Deployment**: Heroku with automatic migrations
+- **Static Files**: WhiteNoise for production serving
 
 ### Project Structure
 ```
@@ -75,20 +77,40 @@ Main model for tracking individual callings
 class Calling(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-        ('COMPLETED', 'Completed'),
-        ('LCR_UPDATED', 'LCR Updated'),
+        ('APPROVED', 'Stake Presidency Approved'),
+        ('HC_APPROVED', 'High Council Approved'),
         ('ON_HOLD', 'On Hold'),
-        ('CANCELLED', 'Cancelled'),
+        ('CALLED', 'Called'),
+        ('LCR_UPDATED', 'LCR Updated'),
     ]
     
-    unit = models.ForeignKey(Unit)
-    organization = models.ForeignKey(Organization)
-    position = models.ForeignKey(Position)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    name = models.CharField(max_length=100, blank=True)
-    proposed_replacement = models.CharField(max_length=100, blank=True)
-    # ... date fields, approval fields, etc.
+    # Core relationships
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    position = models.ForeignKey(Position, on_delete=models.PROTECT)
+    
+    # Member information
+    name = models.CharField(max_length=200, blank=True, null=True)
+    proposed_replacement = models.CharField(max_length=200, blank=True, null=True)
+    home_unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Status and dates
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='PENDING')
+    date_called = models.DateField(null=True, blank=True)
+    date_sustained = models.DateField(null=True, blank=True)
+    date_set_apart = models.DateField(null=True, blank=True)
+    date_released = models.DateField(null=True, blank=True)
+    
+    # Approval tracking (date-based)
+    presidency_approved = models.DateField(null=True, blank=True)
+    hc_approved = models.DateField(null=True, blank=True)
+    bishop_consulted_by = models.CharField(max_length=200, blank=True, null=True)
+    
+    # System fields
+    lcr_updated = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    notes = models.TextField(blank=True, null=True)
+    # ... additional fields
 ```
 
 ### Model Relationships
@@ -102,16 +124,18 @@ class Calling(models.Model):
 Returns Bootstrap CSS class for status badges:
 ```python
 def get_status_badge_class(self):
-    status_classes = {
-        'PENDING': 'info',
+    status_map = {
+        'PENDING': 'warning',
         'APPROVED': 'success',
-        'COMPLETED': 'success',
-        'LCR_UPDATED': 'secondary',
+        'HC_APPROVED': 'success', 
+        'CALLED': 'success',
+        'LCR_UPDATED': 'info',
         'ON_HOLD': 'warning',
-        'CANCELLED': 'danger',
     }
-    return status_classes.get(self.status, 'secondary')
+    return status_map.get(self.status, 'secondary')
 ```
+
+**Note**: Removed CANCELLED and COMPLETED statuses in recent model updates
 
 #### Calling.get_absolute_url()
 Returns the canonical URL for a calling detail view:

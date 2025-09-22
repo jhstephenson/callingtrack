@@ -28,11 +28,20 @@ The dashboard is your central hub for managing callings:
 Callings move through these statuses:
 
 1. **Pending**: Initial proposal, awaiting approval
-2. **Approved**: Approved by leadership, ready to extend
-3. **Completed**: Calling has been extended and accepted
-4. **LCR Updated**: Information has been updated in LCR system
-5. **On Hold**: Temporarily paused
-6. **Cancelled**: Calling proposal was cancelled
+2. **Stake Presidency Approved**: Approved by stake presidency, may need high council approval
+3. **High Council Approved**: Approved by high council (for applicable positions)
+4. **Called**: Calling has been extended and accepted by member
+5. **LCR Updated**: Information has been updated in LCR system
+6. **On Hold**: Temporarily paused for various reasons
+
+### Approval Workflow
+```
+PENDING → APPROVED (Stake Presidency) → HC_APPROVED (High Council) → CALLED → LCR_UPDATED
+                                        ↓
+                                    ON_HOLD (temporary pause)
+```
+
+**Note**: Not all callings require High Council approval. Some positions can go directly from Stake Presidency Approved to Called.
 
 ### Creating a New Calling
 
@@ -90,11 +99,10 @@ Use the search bar to find callings by:
 ## Understanding Status Badges
 
 Each calling displays a colored status badge:
-- **Blue**: Informational statuses (Pending)
-- **Green**: Progress statuses (Approved, Completed)
-- **Yellow**: Warning statuses (On Hold)
-- **Red**: Final/stopped statuses (Cancelled)
-- **Gray**: Administrative statuses (LCR Updated)
+- **Blue (Warning)**: Initial statuses (Pending)
+- **Green (Success)**: Progress statuses (Stake Presidency Approved, High Council Approved, Called)
+- **Yellow (Warning)**: Caution statuses (On Hold)
+- **Gray (Info)**: Administrative statuses (LCR Updated)
 
 ## Tips for Effective Use
 
@@ -118,9 +126,10 @@ Each calling displays a colored status badge:
 
 ### Extending a New Calling
 1. Create calling with status "Pending"
-2. Get approvals, update status to "Approved"
-3. Extend calling, update status to "Completed"
-4. Update LCR system, mark as "LCR Updated"
+2. Get stake presidency approval, update status to "Stake Presidency Approved"
+3. If required, get high council approval, update status to "High Council Approved"
+4. Extend calling to member, update status to "Called"
+5. Update LCR system, mark as "LCR Updated"
 
 ### Replacing an Existing Calling
 1. Note current serving member

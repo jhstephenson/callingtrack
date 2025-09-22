@@ -7,10 +7,10 @@ This guide is for system administrators responsible for setting up and maintaini
 ## Initial Setup
 
 ### System Requirements
-- Python 3.8 or higher
-- Django 4.x
-- Database (SQLite for development, PostgreSQL/MySQL for production)
-- Web server (for production deployment)
+- Python 3.12+ (3.8+ supported)
+- Django 5.2.4+
+- Database (SQLite for development, PostgreSQL for production)
+- Web server (Heroku, Gunicorn + Nginx for production deployment)
 
 ### Installation Steps
 
@@ -150,13 +150,15 @@ DATABASES = {
 ### Customization Options
 
 #### Status Badge Colors
-Modify in models.py `get_status_badge_class()` method:
-- PENDING: 'info' (blue)
-- APPROVED: 'success' (green)
-- COMPLETED: 'success' (green)
-- LCR_UPDATED: 'secondary' (gray)
+Configured in models.py `get_status_badge_class()` method:
+- PENDING: 'warning' (yellow)
+- APPROVED (Stake Presidency): 'success' (green)
+- HC_APPROVED (High Council): 'success' (green)
+- CALLED: 'success' (green)
+- LCR_UPDATED: 'info' (blue)
 - ON_HOLD: 'warning' (yellow)
-- CANCELLED: 'danger' (red)
+
+**Note**: Removed CANCELLED and COMPLETED statuses in recent updates
 
 #### Dashboard Settings
 - Active callings display limit (currently 15)

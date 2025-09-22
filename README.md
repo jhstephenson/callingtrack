@@ -24,7 +24,7 @@ CallingTrack helps church organizations manage their calling processes by provid
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.12+ (3.8+ supported)
 - pip (Python package installer)
 - Git
 
@@ -80,17 +80,27 @@ CallingTrack helps church organizations manage their calling processes by provid
 
 ```
 CallingTrack/
-├── callings/           # Main application
-│   ├── models.py       # Data models
-│   ├── views.py        # View logic
-│   ├── forms.py        # Form definitions
-│   ├── urls.py         # URL patterns
-│   └── templates/      # HTML templates
-├── callingtrack/       # Project settings
-├── static/            # Static files (CSS, JS, images)
-├── media/             # User uploaded files
-├── requirements.txt   # Python dependencies
-└── manage.py         # Django management script
+├── accounts/          # Custom user authentication
+│   ├── models.py      # Custom User model
+│   └── ...
+├── callings/          # Main application
+│   ├── models.py      # Data models (Unit, Organization, Position, Calling)
+│   ├── views.py       # View logic
+│   ├── forms.py       # Form definitions
+│   ├── urls.py        # URL patterns
+│   ├── migrations/    # Database migrations
+│   └── templates/     # HTML templates
+├── callingtrack/      # Project settings
+│   ├── settings.py    # Django configuration
+│   ├── urls.py        # Root URL patterns
+│   └── wsgi.py        # WSGI configuration
+├── static/           # Static files (CSS, JS, images)
+├── templates/        # Global templates
+├── docs/            # Documentation (User, Admin, Technical guides)
+├── requirements.txt  # Python dependencies (Django 5.2.4+)
+├── runtime.txt      # Python version for Heroku
+├── Procfile         # Heroku deployment configuration
+└── manage.py        # Django management script
 ```
 
 ## Contributing
