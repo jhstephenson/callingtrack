@@ -218,6 +218,14 @@ class Calling(models.Model):
     class Meta:
         ordering = ['-date_called']
         verbose_name_plural = 'Callings'
+        indexes = [
+            models.Index(fields=['status', '-date_called'], name='calling_status_date_idx'),
+            models.Index(fields=['unit', 'status'], name='calling_unit_status_idx'),
+            models.Index(fields=['organization', 'status'], name='calling_org_status_idx'),
+            models.Index(fields=['is_active', 'status'], name='calling_active_status_idx'),
+            models.Index(fields=['date_released'], name='calling_released_idx'),
+            models.Index(fields=['lcr_updated'], name='calling_lcr_idx'),
+        ]
 
     def __str__(self):
         return f"{self.name} - {self.position} in {self.organization} ({self.unit})"
@@ -288,6 +296,10 @@ class CallingHistory(models.Model):
     class Meta:
         verbose_name_plural = 'Calling History'
         ordering = ['-changed_at']
+        indexes = [
+            models.Index(fields=['calling', '-changed_at'], name='history_calling_date_idx'),
+            models.Index(fields=['action', '-changed_at'], name='history_action_date_idx'),
+        ]
 
     def __str__(self):
         return f"{self.get_action_display()} - {self.calling} on {self.changed_at.strftime('%Y-%m-%d')}"

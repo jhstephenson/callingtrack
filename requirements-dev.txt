@@ -1,0 +1,17 @@
+# Development dependencies for CallingTrack
+# These are additional packages needed for development and testing
+
+# Testing
+pytest==9.0.2
+pytest-django==4.11.1
+pytest-cov==7.0.0
+factory-boy==3.3.3
+
+# Code Quality (to be added later)
+# black==24.1.0
+# ruff==0.1.13
+# isort==5.13.2
+
+# Development Tools (to be added later)
+# django-debug-toolbar==4.2.0
+# ipython==8.20.0
