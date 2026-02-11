@@ -241,6 +241,7 @@ class TestManagementCommandIntegration:
         
         # Bishop should be able to add/change but not delete
         user.groups.add(bishop_group)
+        user = type(user).objects.get(pk=user.pk)  # Refresh to clear permission cache
         assert user.has_perm('callings.add_calling')
         assert user.has_perm('callings.change_calling')
         assert not user.has_perm('callings.delete_calling')
@@ -248,6 +249,7 @@ class TestManagementCommandIntegration:
         # Remove bishop, add leadership
         user.groups.remove(bishop_group)
         user.groups.add(leadership_group)
+        user = type(user).objects.get(pk=user.pk)  # Refresh to clear permission cache
         
         # Leadership should only have view
         assert not user.has_perm('callings.add_calling')

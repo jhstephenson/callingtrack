@@ -42,6 +42,13 @@ def clerk_client(client, clerk_user):
     return client
 
 
+@pytest.fixture
+def superuser_client(client, superuser):
+    """Create a client logged in as superuser."""
+    client.force_login(superuser)
+    return client
+
+
 @pytest.mark.django_db
 class TestAuthentication:
     """Tests for authentication requirements."""
@@ -105,13 +112,13 @@ class TestUnitViews:
         assert response.status_code == 200
         assert response.context['object'] == ward
         
-    def test_unit_create_view_get(self, authenticated_client):
+    def test_unit_create_view_get(self, superuser_client):
         """Test unit create view GET request."""
-        response = authenticated_client.get(reverse('callings:unit-create'))
+        response = superuser_client.get(reverse('callings:unit-create'))
         assert response.status_code == 200
         assert 'form' in response.context
         
-    def test_unit_create_view_post(self, authenticated_client):
+    def test_unit_create_view_post(self, superuser_client):
         """Test unit create view POST request."""
         data = {
             'name': 'New Ward',
@@ -119,14 +126,14 @@ class TestUnitViews:
             'sort_order': 1,
             'is_active': True,
         }
-        response = authenticated_client.post(
+        response = superuser_client.post(
             reverse('callings:unit-create'), 
             data=data
         )
         assert response.status_code == 302  # Redirect after success
         assert Unit.objects.filter(name='New Ward').exists()
         
-    def test_unit_update_view(self, authenticated_client, ward):
+    def test_unit_update_view(self, superuser_client, ward):
         """Test unit update view."""
         url = reverse('callings:unit-update', kwargs={'pk': ward.pk})
         data = {
@@ -135,15 +142,15 @@ class TestUnitViews:
             'sort_order': 1,
             'is_active': True,
         }
-        response = authenticated_client.post(url, data=data)
+        response = superuser_client.post(url, data=data)
         assert response.status_code == 302
         ward.refresh_from_db()
         assert ward.name == 'Updated Ward Name'
         
-    def test_unit_delete_view(self, authenticated_client, ward):
+    def test_unit_delete_view(self, superuser_client, ward):
         """Test unit delete view."""
         url = reverse('callings:unit-delete', kwargs={'pk': ward.pk})
-        response = authenticated_client.post(url)
+        response = superuser_client.post(url)
         assert response.status_code == 302
         # Note: Depending on implementation, might be soft delete or hard delete
 
@@ -158,7 +165,7 @@ class TestOrganizationViews:
         assert response.status_code == 200
         assert organization in response.context['object_list']
         
-    def test_organization_create_view(self, authenticated_client, ward):
+    def test_organization_create_view(self, superuser_client, ward):
         """Test organization create view."""
         data = {
             'name': 'Young Women',
@@ -166,14 +173,14 @@ class TestOrganizationViews:
             'leader': 'Sister Smith',
             'is_active': True,
         }
-        response = authenticated_client.post(
+        response = superuser_client.post(
             reverse('callings:organization-create'),
             data=data
         )
         assert response.status_code == 302
         assert Organization.objects.filter(name='Young Women').exists()
         
-    def test_organization_update_view(self, authenticated_client, organization):
+    def test_organization_update_view(self, superuser_client, organization):
         """Test organization update view."""
         url = reverse('callings:organization-update', kwargs={'pk': organization.pk})
         data = {
@@ -182,7 +189,7 @@ class TestOrganizationViews:
             'leader': 'New Leader',
             'is_active': True,
         }
-        response = authenticated_client.post(url, data=data)
+        response = superuser_client.post(url, data=data)
         assert response.status_code == 302
         organization.refresh_from_db()
         assert organization.leader == 'New Leader'
@@ -198,7 +205,7 @@ class TestPositionViews:
         assert response.status_code == 200
         assert position in response.context['object_list']
         
-    def test_position_create_view(self, authenticated_client):
+    def test_position_create_view(self, superuser_client):
         """Test position create view."""
         data = {
             'title': 'Sunday School President',
@@ -207,7 +214,7 @@ class TestPositionViews:
             'is_leadership': True,
             'requires_setting_apart': True,
         }
-        response = authenticated_client.post(
+        response = superuser_client.post(
             reverse('callings:position-create'),
             data=data
         )
@@ -232,14 +239,14 @@ class TestCallingViews:
         assert response.status_code == 200
         assert response.context['object'] == calling
         
-    def test_calling_create_view_get(self, authenticated_client):
+    def test_calling_create_view_get(self, superuser_client):
         """Test calling create view GET request."""
-        response = authenticated_client.get(reverse('callings:calling-create'))
+        response = superuser_client.get(reverse('callings:calling-create'))
         assert response.status_code == 200
         assert 'form' in response.context
         
     def test_calling_create_view_post(
-        self, authenticated_client, ward, organization, position
+        self, superuser_client, ward, organization, position
     ):
         """Test calling create view POST request."""
         from datetime import date
@@ -252,14 +259,14 @@ class TestCallingViews:
             'date_called': date.today().isoformat(),
             'is_active': True,
         }
-        response = authenticated_client.post(
+        response = superuser_client.post(
             reverse('callings:calling-create'),
             data=data
         )
         assert response.status_code == 302
         assert Calling.objects.filter(name='New Member').exists()
         
-    def test_calling_update_view(self, authenticated_client, calling):
+    def test_calling_update_view(self, superuser_client, calling):
         """Test calling update view."""
         url = reverse('callings:calling-update', kwargs={'pk': calling.pk})
         data = {
@@ -270,23 +277,23 @@ class TestCallingViews:
             'status': calling.status,
             'is_active': True,
         }
-        response = authenticated_client.post(url, data=data)
+        response = superuser_client.post(url, data=data)
         assert response.status_code == 302
         calling.refresh_from_db()
         assert calling.name == 'Updated Name'
         
-    def test_calling_delete_view_get(self, authenticated_client, calling):
+    def test_calling_delete_view_get(self, superuser_client, calling):
         """Test calling delete view GET shows confirmation."""
         url = reverse('callings:calling-delete', kwargs={'pk': calling.pk})
-        response = authenticated_client.get(url)
+        response = superuser_client.get(url)
         assert response.status_code == 200
         assert 'object' in response.context
         
-    def test_calling_delete_view_post(self, authenticated_client, calling):
+    def test_calling_delete_view_post(self, superuser_client, calling):
         """Test calling delete view POST deletes calling."""
         calling_id = calling.id
         url = reverse('callings:calling-delete', kwargs={'pk': calling.pk})
-        response = authenticated_client.post(url)
+        response = superuser_client.post(url)
         assert response.status_code == 302
         # Check if calling still exists (might be soft delete)
         
@@ -299,31 +306,31 @@ class TestPermissionEnforcement:
         """Test that regular users cannot delete callings."""
         url = reverse('callings:calling-delete', kwargs={'pk': calling.pk})
         response = authenticated_client.get(url)
-        # Depending on implementation, should be 403 or redirect
-        assert response.status_code in [302, 403]
+        # Should be forbidden
+        assert response.status_code == 403
         
     def test_stake_president_can_delete_calling(
-        self, stake_president_client, calling
+        self, superuser_client, calling
     ):
-        """Test that stake presidents can delete callings."""
+        """Test that superusers can delete callings."""
         url = reverse('callings:calling-delete', kwargs={'pk': calling.pk})
-        response = stake_president_client.get(url)
+        response = superuser_client.get(url)
         # Should be able to access delete page
-        assert response.status_code in [200, 302]
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
 class TestCallingReleaseView:
     """Tests for calling release view."""
     
-    def test_release_view_get(self, authenticated_client, calling):
+    def test_release_view_get(self, superuser_client, calling):
         """Test release view GET request."""
         url = reverse('callings:calling-release', kwargs={'pk': calling.pk})
-        response = authenticated_client.get(url)
+        response = superuser_client.get(url)
         assert response.status_code == 200
         assert 'form' in response.context
         
-    def test_release_view_post(self, authenticated_client, calling):
+    def test_release_view_post(self, superuser_client, calling):
         """Test release view POST request."""
         from datetime import date
         url = reverse('callings:calling-release', kwargs={'pk': calling.pk})
@@ -332,7 +339,7 @@ class TestCallingReleaseView:
             'released_by': 'Bishop Smith',
             'release_notes': 'End of service',
         }
-        response = authenticated_client.post(url, data=data)
+        response = superuser_client.post(url, data=data)
         assert response.status_code == 302
         calling.refresh_from_db()
         assert calling.date_released is not None
@@ -370,7 +377,7 @@ class TestErrorHandling:
         assert response.status_code == 404
         
     def test_invalid_form_submission_shows_errors(
-        self, authenticated_client, ward, organization, position
+        self, superuser_client, ward, organization, position
     ):
         """Test that invalid form shows validation errors."""
         from datetime import date, timedelta
@@ -384,7 +391,7 @@ class TestErrorHandling:
             'date_sustained': today - timedelta(days=1),  # Invalid!
             'is_active': True,
         }
-        response = authenticated_client.post(
+        response = superuser_client.post(
             reverse('callings:calling-create'),
             data=data
         )

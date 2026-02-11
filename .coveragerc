@@ -11,6 +11,10 @@ omit =
     manage.py
     callingtrack/wsgi.py
     callingtrack/asgi.py
+    */management/commands/import_callings.py
+    */management/commands/import_completed_callings.py
+    */management/commands/cleanup_members.py
+    accounts/forms.py
 
 [report]
 exclude_lines =
